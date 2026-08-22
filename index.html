@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SS INFOTECH – Tax Computation Pro</title>
+  <meta name="description" content="Professional Income Tax Computation Software by SS INFOTECH" />
+
+  <!-- Instant theme: prevents flash of wrong theme -->
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');</script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap + Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     PRINT AREA – Hidden on screen, shown on print
+     ══════════════════════════════════════════════════════════ -->
+<div id="print-area"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SIDEBAR
+     ══════════════════════════════════════════════════════════ -->
+<aside id="sidebar" class="sidebar" role="navigation" aria-label="Main navigation">
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="brand-logo" aria-hidden="true">
+      <i class="bi bi-calculator-fill"></i>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">SS INFOTECH</span>
+      <span class="brand-sub">Tax Computation Pro</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav" aria-label="Primary">
+    <div class="nav-section-label">MAIN</div>
+
+    <a href="#" class="nav-item active" data-page="dashboard" aria-current="page" id="nav-dashboard">
+      <i class="bi bi-speedometer2" aria-hidden="true"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="#" class="nav-item" data-page="new-computation" id="nav-new-computation">
+      <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+      <span>New Computation</span>
+    </a>
+    <a href="#" class="nav-item" data-page="clients" id="nav-clients">
+      <i class="bi bi-people-fill" aria-hidden="true"></i>
+      <span>Client Database</span>
+    </a>
+    <a href="#" class="nav-item" data-page="salary-slip" id="nav-salary-slip">
+      <i class="bi bi-file-earmark-person-fill" aria-hidden="true"></i>
+      <span>Salary Slip</span>
+    </a>
+    <a href="#" class="nav-item" data-page="bank-statement" id="nav-bank-statement">
+      <i class="bi bi-bank" aria-hidden="true"></i>
+      <span>Bank Statement</span>
+    </a>
+
+    <div class="nav-section-label">SETTINGS</div>
+    <a href="#" class="nav-item" data-page="admin" id="nav-admin">
+      <i class="bi bi-gear-fill" aria-hidden="true"></i>
+      <span>Admin Panel</span>
+    </a>
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <div class="theme-toggle" title="Toggle dark/light mode">
+      <i class="bi bi-sun-fill theme-icon-sun" aria-hidden="true"></i>
+      <div class="toggle-switch" id="themeToggle" role="switch" aria-label="Toggle theme" tabindex="0">
+        <div class="toggle-thumb"></div>
+      </div>
+      <i class="bi bi-moon-fill theme-icon-moon" aria-hidden="true"></i>
+    </div>
+    <div class="sidebar-version">v1.0.0 &nbsp;|&nbsp; AY 2026-27 (Current A.Y.)</div>
+  </div>
+</aside>
+
+<!-- Mobile overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN WRAPPER
+     ══════════════════════════════════════════════════════════ -->
+<div class="main-wrapper" id="mainWrapper">
+
+  <!-- ── TOPBAR ─────────────────────────────────────────── -->
+  <header class="topbar" role="banner">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" aria-expanded="false">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <div class="topbar-title" id="topbarTitle">
+      <span class="topbar-page-icon"><i class="bi bi-speedometer2"></i></span>
+      <span id="topbarTitleText">Dashboard</span>
+    </div>
+
+    <div class="topbar-actions">
+      <div class="topbar-ay-badge" id="currentAY">
+        <i class="bi bi-calendar3"></i>
+        AY 2026-27 (Current A.Y.)
+      </div>
+    </div>
+  </header>
+
+  <!-- ── PAGE CONTENT ──────────────────────────────────── -->
+  <main class="page-content" role="main">
+
+    <!-- ════════════════════════════════════════════════════
+         PAGE: DASHBOARD
+         ════════════════════════════════════════════════════ -->
+    <section id="page-dashboard" class="page active" aria-label="Dashboard">
+
+      <!-- Welcome Banner -->
+      <div class="dash-welcome">
+        <div class="dash-welcome-left">
+          <div class="dash-welcome-icon"><i class="bi bi-speedometer2"></i></div>
+          <div>
+            <h2 class="dash-welcome-title">Welcome to Tax Computation Pro</h2>
+            <p class="dash-welcome-sub" id="dashDate"></p>
+          </div>
+        </div>
+        <button class="btn btn-primary dash-quick-btn" onclick="App.navTo('new-computation')">
+          <i class="bi bi-plus-lg me-1"></i>New Computation
+        </button>
+      </div>
+
+      <!-- Stat Cards Row -->
+      <div class="dashboard-grid" role="list">
+
+        <div class="stat-card primary" role="listitem">
+          <div class="stat-icon" aria-hidden="true"><i class="bi bi-file-earmark-text-fill"></i></div>
+          <div class="stat-body">
+            <div class="stat-num" id="stat-today">0</div>
+            <div class="stat-label">Today's Computations</div>
+          </div>
+          <div class="stat-trend" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></div>
+        </div>
+
+        <div class="stat-card success" role="listitem">
+          <div class="stat-icon" aria-hidden="true"><i class="bi bi-people-fill"></i></div>
+          <div class="stat-body">
+            <div class="stat-num" id="stat-clients">0</div>
+            <div class="stat-label">Total Clients</div>
+          </div>
+          <div class="stat-trend" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></div>
+        </div>
+
+        <div class="stat-card warning" role="listitem">
+          <div class="stat-icon" aria-hidden="true"><i class="bi bi-arrow-return-left"></i></div>
+          <div class="stat-body">
+            <div class="stat-num" id="stat-refund">0</div>
+            <div class="stat-label">Refund Cases</div>
+          </div>
+          <div class="stat-trend" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></div>
+        </div>
+
+        <div class="stat-card danger" role="listitem">
+          <div class="stat-icon" aria-hidden="true"><i class="bi bi-cash-stack"></i></div>
+          <div class="stat-body">
+            <div class="stat-num" id="stat-payable">0</div>
+            <div class="stat-label">Tax Payable Cases</div>
+          </div>
+          <div class="stat-trend" aria-hidden="true"><i class="bi bi-arrow-down-right"></i></div>
+        </div>
+
+      </div><!-- /.dashboard-grid -->
+
+      <!-- Quick Actions -->
+      <div class="dash-quick-actions">
+        <button type="button" class="dash-qa-item" onclick="App.navTo('new-computation')">
+          <div class="dash-qa-icon" style="background:rgba(99,102,241,.12);color:#818cf8"><i class="bi bi-file-earmark-plus-fill"></i></div>
+          <span>New Computation</span>
+        </button>
+        <button type="button" class="dash-qa-item" onclick="App.navTo('clients')">
+          <div class="dash-qa-icon" style="background:rgba(16,185,129,.12);color:#34d399"><i class="bi bi-people-fill"></i></div>
+          <span>Client Database</span>
+        </button>
+        <button type="button" class="dash-qa-item" onclick="App.navTo('admin')">
+          <div class="dash-qa-icon" style="background:rgba(139,92,246,.12);color:#a78bfa"><i class="bi bi-gear-fill"></i></div>
+          <span>Admin Panel</span>
+        </button>
+        <button type="button" class="dash-qa-item" onclick="App.navTo('new-computation');setTimeout(()=>App.goStep(4),100)">
+          <div class="dash-qa-icon" style="background:rgba(239,68,68,.12);color:#f87171"><i class="bi bi-calculator-fill"></i></div>
+          <span>Quick Compute</span>
+        </button>
+      </div>
+
+      <!-- Chart + Recent Row -->
+      <div class="dash-content-row">
+
+        <div class="dash-chart-col">
+          <div class="card-panel">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-primary" aria-hidden="true"><i class="bi bi-bar-chart-fill"></i></div>
+                <div>
+                  <h6 class="panel-title-text">AY-wise Summary</h6>
+                  <p class="panel-subtitle">Clients filed per assessment year</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body" style="padding:20px 24px">
+              <canvas id="chartAY" height="200" role="img" aria-label="Bar chart showing AY-wise client count"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-recent-col">
+          <div class="card-panel">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-success" aria-hidden="true"><i class="bi bi-clock-history"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Recent Clients</h6>
+                  <p class="panel-subtitle">Latest computations</p>
+                </div>
+              </div>
+              <a href="#" class="panel-action-link" data-page="clients">View all →</a>
+            </div>
+            <div id="recentClients" class="recent-list" role="list" aria-label="Recent clients list"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════════════
+         PAGE: NEW COMPUTATION (WIZARD)
+         ════════════════════════════════════════════════════ -->
+    <section id="page-new-computation" class="page" aria-label="New Computation Wizard">
+      <div class="wizard-container">
+
+        <!-- Step Indicator Bar -->
+        <div class="wizard-steps" role="tablist" aria-label="Computation steps">
+
+          <div class="step active" data-step="1" role="tab" aria-selected="true" aria-controls="step-panel-1">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div class="step-lbl">Personal</div>
+          </div>
+          <div class="step-line" aria-hidden="true"></div>
+
+          <div class="step" data-step="2" role="tab" aria-selected="false" aria-controls="step-panel-2">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div class="step-lbl">Business</div>
+          </div>
+          <div class="step-line" aria-hidden="true"></div>
+
+          <div class="step" data-step="3" role="tab" aria-selected="false" aria-controls="step-panel-3">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div class="step-lbl">Bank</div>
+          </div>
+          <div class="step-line" aria-hidden="true"></div>
+
+          <div class="step" data-step="4" role="tab" aria-selected="false" aria-controls="step-panel-4">
+            <div class="step-num" aria-hidden="true">4</div>
+            <div class="step-lbl">Income</div>
+          </div>
+          <div class="step-line" aria-hidden="true"></div>
+
+          <div class="step" data-step="5" role="tab" aria-selected="false" aria-controls="step-panel-5">
+            <div class="step-num" aria-hidden="true">5</div>
+            <div class="step-lbl">Preview</div>
+          </div>
+
+        </div><!-- /.wizard-steps -->
+
+        <!-- ── Step 1: Personal Details ── -->
+        <div class="wizard-panel active" id="step-panel-1" role="tabpanel" aria-labelledby="step-1">
+          <h5 class="panel-title"><i class="bi bi-person-vcard-fill me-2" aria-hidden="true"></i>Personal Details</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="f-name">Full Name <span class="required-mark">*</span></label>
+              <input type="text" class="form-control text-uppercase" id="f-name" placeholder="e.g. Ramesh Kumar Sharma" autocomplete="name" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="f-father">Father's Name <span class="required-mark">*</span></label>
+              <input type="text" class="form-control text-uppercase" id="f-father" placeholder="e.g. Suresh Kumar Sharma" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-pan">PAN <span class="required-mark">*</span></label>
+              <input type="text" class="form-control text-uppercase" id="f-pan" maxlength="10" placeholder="ABCDE1234F" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-dob">Date of Birth <span class="required-mark">*</span></label>
+              <input type="date" class="form-control" id="f-dob" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-gender">Gender</label>
+              <select class="form-select" id="f-gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-mobile">Mobile Number <span class="required-mark">*</span></label>
+              <input type="tel" class="form-control" id="f-mobile" maxlength="10" placeholder="98XXXXXXXX" autocomplete="tel" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-email">Email ID</label>
+              <input type="email" class="form-control" id="f-email" placeholder="email@example.com" autocomplete="email" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-status">Residential Status</label>
+              <select class="form-select" id="f-status">
+                <option value="Resident">Resident</option>
+                <option value="Non-Resident">Non-Resident</option>
+                <option value="RNOR">RNOR</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="f-address">Address <span class="required-mark">*</span></label>
+              <textarea class="form-control text-uppercase" id="f-address" rows="2" placeholder="Full address with city, state and PIN code"></textarea>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-ay">Assessment Year <span class="required-mark">*</span></label>
+              <select class="form-select" id="f-ay">
+                <option value="2023-24">AY 2023-24</option>
+                <option value="2024-25">AY 2024-25</option>
+                <option value="2025-26">AY 2025-26</option>
+                <option value="2026-27" selected>AY 2026-27 (Current A.Y.)</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-ward">Ward / Circle</label>
+              <input type="text" class="form-control text-uppercase" id="f-ward" placeholder="e.g. Ward 1(1)" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-filing">Filed u/s</label>
+              <select class="form-select" id="f-filing">
+                <option value="139(1)">139(1) - Return filed on or before due date</option>
+                <option value="139(4)">139(4) - Belated- Return filed after due date</option>
+                <option value="139(5)">139(5) - Revised- Return revised after filing original return</option>
+                <option value="139(8A)">139(8A) - Updated Return</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Step 2: Business Details ── -->
+        <div class="wizard-panel" id="step-panel-2" role="tabpanel">
+          <h5 class="panel-title"><i class="bi bi-briefcase-fill me-2" aria-hidden="true"></i>Business Details <span class="panel-title-sub">(Section 44AD)</span></h5>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="f-bname">Business Name</label>
+              <input type="text" class="form-control text-uppercase" id="f-bname" placeholder="e.g. ABC Enterprises (Optional)" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="f-nature">Nature of Business <span class="required-mark">*</span></label>
+              <select class="form-select" id="f-nature" onchange="App.onNatureChange()">
+                <option value="">-- Select --</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label" for="f-bcode">Business Code</label>
+              <input type="text" class="form-control" id="f-bcode" placeholder="Auto-populated" readonly />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label" for="f-regime">Tax Regime</label>
+              <select class="form-select" id="f-regime">
+                <option value="New" selected>New Regime</option>
+              </select>
+            </div>
+          </div>
+          <div class="info-box mt-3">
+            <i class="bi bi-info-circle-fill me-2" aria-hidden="true"></i>
+            Under <strong>Section 44AD</strong>, profit is automatically declared at <strong>20%</strong> of turnover. Turnover will be auto-calculated from your declared business income.
+          </div>
+        </div>
+
+        <!-- ── Step 3: Bank Details ── -->
+        <div class="wizard-panel" id="step-panel-3" role="tabpanel">
+          <h5 class="panel-title"><i class="bi bi-bank2 me-2" aria-hidden="true"></i>Bank Account Details</h5>
+          <div id="bank-list" aria-live="polite"></div>
+          <button class="btn btn-outline-primary mt-3" onclick="App.addBank()" aria-label="Add another bank account">
+            <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>Add Bank Account
+          </button>
+        </div>
+
+        <!-- ── Step 4: Income Details ── -->
+        <div class="wizard-panel" id="step-panel-4" role="tabpanel">
+          <h5 class="panel-title"><i class="bi bi-cash-coin me-2" aria-hidden="true"></i>Income Details</h5>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-bold" for="f-income">Desired Total Annual Income (₹) <span class="required-mark">*</span></label>
+              <div class="input-group input-group-lg">
+                <span class="input-group-text">₹</span>
+                <input type="number" class="form-control" id="f-income" placeholder="e.g. 850000" onchange="App.recalcIncome()" aria-label="Annual income in rupees" />
+              </div>
+              <div class="form-text">This is the income that will appear on the final computation.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Deductor / TDS Option</label>
+              <div id="f-deductor-container" class="ded-grid" role="group" aria-label="Deductor selection">
+              </div>
+            </div>
+          </div>
+
+          <h6 class="section-sub-heading">Optional Income Sources</h6>
+          <div class="row g-3">
+            <div class="col-md-3">
+              <div class="income-toggle-card selected" id="toggle-savings" onclick="App.toggleIncome('savings')" role="checkbox" aria-checked="true" tabindex="0">
+                <div class="itc-icon" aria-hidden="true"><i class="bi bi-piggy-bank-fill"></i></div>
+                <div class="itc-body">
+                  <div class="itc-name">Savings Bank Interest</div>
+                  <div class="itc-badge">Mandatory</div>
+                </div>
+                <div class="itc-check" aria-hidden="true"><i class="bi bi-check-circle-fill"></i></div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="income-toggle-card" id="toggle-stcg" onclick="App.toggleIncome('stcg')" role="checkbox" aria-checked="false" tabindex="0">
+                <div class="itc-icon" aria-hidden="true"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="itc-body">
+                  <div class="itc-name">Short Term Capital Gain</div>
+                  <div class="itc-badge optional">Optional</div>
+                </div>
+                <div class="itc-check" aria-hidden="true"><i class="bi bi-circle"></i></div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="income-toggle-card" id="toggle-pl" onclick="App.toggleIncome('pl')" role="checkbox" aria-checked="false" tabindex="0">
+                <div class="itc-icon" aria-hidden="true"><i class="bi bi-bar-chart-line-fill"></i></div>
+                <div class="itc-body">
+                  <div class="itc-name">Profit &amp; Loss Income</div>
+                  <div class="itc-badge optional">Optional</div>
+                </div>
+                <div class="itc-check" aria-hidden="true"><i class="bi bi-circle"></i></div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="income-toggle-card selected" id="toggle-bs" onclick="App.toggleIncome('bs')" role="checkbox" aria-checked="true" tabindex="0">
+                <div class="itc-icon" aria-hidden="true"><i class="bi bi-balance-scale"></i></div>
+                <div class="itc-body">
+                  <div class="itc-name">Balance Sheet</div>
+                  <div class="itc-badge">Mandatory</div>
+                </div>
+                <div class="itc-check" aria-hidden="true"><i class="bi bi-check-circle-fill"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="income-inputs" class="mt-4" aria-live="polite"></div>
+
+          <div id="balance-sheet-inputs" class="mt-4" aria-live="polite" style="display:none;"></div>
+
+          <!-- Live Breakdown -->
+          <div class="income-breakdown mt-4" id="income-breakdown" aria-live="polite" aria-label="Live income breakdown">
+            <h6 class="breakdown-heading"><i class="bi bi-calculator me-2" aria-hidden="true"></i>Live Income Breakdown</h6>
+            <div class="breakdown-row">
+              <span>Business Income (44AD)</span>
+              <span class="fw-bold" id="brk-business">₹ 0</span>
+            </div>
+            <div class="breakdown-row">
+              <span>Savings Bank Interest</span>
+              <span id="brk-savings">₹ 0</span>
+            </div>
+            <div class="breakdown-row" id="brk-stcg-row" style="display:none">
+              <span>Short Term Capital Gain</span>
+              <span id="brk-stcg">₹ 0</span>
+            </div>
+            <div class="breakdown-row" id="brk-pl-row" style="display:none">
+              <span>P&amp;L Income</span>
+              <span id="brk-pl">₹ 0</span>
+            </div>
+            <div class="breakdown-row total">
+              <span>Total Income</span>
+              <span id="brk-total">₹ 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Step 5: Preview & Generate ── -->
+        <div class="wizard-panel" id="step-panel-5" role="tabpanel">
+          <h5 class="panel-title"><i class="bi bi-eye-fill me-2" aria-hidden="true"></i>Preview &amp; Generate</h5>
+
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="preview-card" id="preview-summary">
+                <!-- filled by JS -->
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="preview-card" id="preview-tax">
+                <!-- filled by JS -->
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-12">
+              <h6 class="section-sub-heading">Choose Output Format</h6>
+              <div class="report-type-grid">
+                <div class="report-type-card active" id="rt-classic" onclick="App.selectReport('classic')" role="radio" aria-checked="true" tabindex="0">
+                  <div class="rtc-icon" aria-hidden="true"><i class="bi bi-file-text-fill"></i></div>
+                  <div class="rtc-label">Classic ITR Format</div>
+                  <div class="rtc-sub">Traditional computation layout</div>
+                </div>
+                <div class="report-type-card" id="rt-modern" onclick="App.selectReport('modern')" role="radio" aria-checked="false" tabindex="0">
+                  <div class="rtc-icon" aria-hidden="true"><i class="bi bi-file-richtext-fill"></i></div>
+                  <div class="rtc-label">Modern Professional</div>
+                  <div class="rtc-sub">Colorful client-friendly report</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-generate-actions">
+            <button class="btn btn-success btn-lg generate-btn" onclick="App.generateReport()">
+              <i class="bi bi-file-earmark-check-fill me-2" aria-hidden="true"></i>Generate Computation
+            </button>
+            <button class="btn btn-outline-secondary" onclick="App.saveClient()">
+              <i class="bi bi-save-fill me-2" aria-hidden="true"></i>Save Client
+            </button>
+          </div>
+        </div>
+
+        <!-- Wizard Navigation Footer -->
+        <div class="wizard-footer">
+          <button class="btn btn-outline-secondary" id="btnPrev" onclick="App.prevStep()" style="display:none">
+            <i class="bi bi-chevron-left me-1" aria-hidden="true"></i>Previous
+          </button>
+          <button class="btn btn-primary px-4" id="btnNext" onclick="App.nextStep()">
+            Next <i class="bi bi-chevron-right ms-1" aria-hidden="true"></i>
+          </button>
+        </div>
+
+      </div><!-- /.wizard-container -->
+    </section>
+
+    <!-- ════════════════════════════════════════════════════
+         PAGE: CLIENT DATABASE
+         ════════════════════════════════════════════════════ -->
+    <section id="page-clients" class="page" aria-label="Client Database">
+
+      <!-- Stats Row -->
+      <div class="client-stats-row" id="clientStats">
+        <div class="client-stat-card">
+          <div class="client-stat-icon" style="background:rgba(99,102,241,.12);color:#6366f1"><i class="bi bi-people-fill"></i></div>
+          <div class="client-stat-body">
+            <div class="client-stat-num" id="cs-total">0</div>
+            <div class="client-stat-label">Total Clients</div>
+          </div>
+        </div>
+        <div class="client-stat-card">
+          <div class="client-stat-icon" style="background:rgba(16,185,129,.12);color:#10b981"><i class="bi bi-arrow-return-left"></i></div>
+          <div class="client-stat-body">
+            <div class="client-stat-num" id="cs-refund">0</div>
+            <div class="client-stat-label">Refund Cases</div>
+          </div>
+        </div>
+        <div class="client-stat-card">
+          <div class="client-stat-icon" style="background:rgba(239,68,68,.12);color:#ef4444"><i class="bi bi-cash-stack"></i></div>
+          <div class="client-stat-body">
+            <div class="client-stat-num" id="cs-payable">0</div>
+            <div class="client-stat-label">Tax Payable</div>
+          </div>
+        </div>
+        <div class="client-stat-card">
+          <div class="client-stat-icon" style="background:rgba(139,92,246,.12);color:#8b5cf6"><i class="bi bi-file-earmark-check"></i></div>
+          <div class="client-stat-body">
+            <div class="client-stat-num" id="cs-nil">0</div>
+            <div class="client-stat-label">Nil Tax</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Bar -->
+      <div class="card-panel">
+        <div class="panel-header">
+          <div class="panel-header-left">
+            <div class="panel-icon panel-icon-success" aria-hidden="true"><i class="bi bi-people-fill"></i></div>
+            <div>
+              <h6 class="panel-title-text">Client Database</h6>
+              <p class="panel-subtitle">All saved tax computations</p>
+            </div>
+          </div>
+          <div class="panel-header-actions">
+            <div class="search-box">
+              <i class="bi bi-search search-icon" aria-hidden="true"></i>
+              <input type="search" class="form-control search-input" id="clientSearch"
+                placeholder="Search name, PAN, mobile…"
+                oninput="App.searchClients()"
+                aria-label="Search clients" />
+            </div>
+            <button class="btn btn-outline-primary btn-sm" onclick="App.downloadAllClients()" title="Export All Saved Client ITRs">
+              <i class="bi bi-download me-1"></i>Export All (JSON)
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="App.navTo('new-computation')" aria-label="Add new client">
+              <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>New Client
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Cards Grid -->
+      <div class="client-grid" id="clientGrid" aria-live="polite"></div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="no-clients" style="display:none" aria-live="polite">
+        <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+        <div class="empty-title">No clients found</div>
+        <div class="empty-sub">Create your first computation to get started</div>
+        <button class="btn btn-primary mt-3" onclick="App.navTo('new-computation')">
+          <i class="bi bi-plus-lg me-2" aria-hidden="true"></i>New Computation
+        </button>
+      </div>
+
+      <!-- Hidden table for data compatibility -->
+      <table class="d-none" id="clientTable"><tbody id="clientTbody"></tbody></table>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════
+         PAGE: ADMIN PANEL
+         ════════════════════════════════════════════════════ -->
+    <section id="page-admin" class="page" aria-label="Admin Panel">
+
+      <!-- Page heading -->
+      <div class="admin-page-header">
+        <div>
+          <h4 class="admin-page-title"><i class="bi bi-gear-fill me-2" aria-hidden="true"></i>Admin &amp; System Configuration</h4>
+          <p class="admin-page-sub">Configure masters, business rules, company profiles, and data backup</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary" onclick="App.downloadLocalBackup()" title="Export JSON Backup">
+            <i class="bi bi-download me-1"></i>Backup
+          </button>
+          <button class="btn btn-success" onclick="App.saveAdminConfig()">
+            <i class="bi bi-save-fill me-2" aria-hidden="true"></i>Save All Settings
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Category Navigation Tabs -->
+      <div class="admin-tab-nav mb-4" id="admin-tab-nav">
+        <button class="admin-tab-btn active" data-sec="all" onclick="App.filterAdminSection('all')"><i class="bi bi-grid-fill"></i> All Settings</button>
+        <button class="admin-tab-btn" data-sec="company" onclick="App.filterAdminSection('company')"><i class="bi bi-building"></i> Company &amp; Business</button>
+        <button class="admin-tab-btn" data-sec="masters" onclick="App.filterAdminSection('masters')"><i class="bi bi-bank"></i> Banks &amp; Payroll</button>
+        <button class="admin-tab-btn" data-sec="tax" onclick="App.filterAdminSection('tax')"><i class="bi bi-calendar2-check"></i> Deductors &amp; AY Rules</button>
+        <button class="admin-tab-btn" data-sec="backup" onclick="App.filterAdminSection('backup')"><i class="bi bi-shield-check"></i> Backup &amp; Data</button>
+      </div>
+
+      <div class="row g-4" id="admin-cards-container">
+
+        <!-- ═══ SECTION: COMPANY & BUSINESS ═══ -->
+
+        <!-- Company Details -->
+        <div class="col-lg-6 admin-card-item" data-admin-sec="company">
+          <div class="card-panel h-100">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-success" aria-hidden="true"><i class="bi bi-building-fill"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Company Details</h6>
+                  <p class="panel-subtitle">Primary firm info for reports &amp; printouts</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body p-3">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label small fw-semibold" for="admin-company">Company / Firm Name</label>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-briefcase"></i></span>
+                    <input type="text" class="form-control form-control-sm text-uppercase" id="admin-company" value="SS INFOTECH" placeholder="Company Name" />
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold" for="admin-footer">Tagline / Report Subtitle</label>
+                  <input type="text" class="form-control form-control-sm" id="admin-footer" value="Professional Tax Computation Services" placeholder="Tagline or Footer line" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold" for="admin-signatory">Authorised Signatory Designation</label>
+                  <input type="text" class="form-control form-control-sm text-uppercase" id="admin-signatory" value="Proprietor" placeholder="e.g. Proprietor / Partner / Director" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Business Configuration -->
+        <div class="col-lg-6 admin-card-item" data-admin-sec="company">
+          <div class="card-panel h-100">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-warning" aria-hidden="true"><i class="bi bi-sliders2"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Business &amp; Tax Parameters</h6>
+                  <p class="panel-subtitle">Default profit, interest limits &amp; TDS percentages</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body p-3">
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <label class="form-label small fw-semibold" for="admin-profit">Default Profit %</label>
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control form-control-sm" id="admin-profit" value="20" min="1" max="100" />
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small fw-semibold" for="admin-int-min">Min Interest (₹)</label>
+                  <input type="number" class="form-control form-control-sm" id="admin-int-min" value="1200" step="100" />
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small fw-semibold" for="admin-int-max">Max Interest (₹)</label>
+                  <input type="number" class="form-control form-control-sm" id="admin-int-max" value="8000" step="500" />
+                </div>
+                <div class="col-12 mt-2 pt-2 border-top">
+                  <span class="text-muted small fw-semibold text-uppercase" style="font-size:10.5px;letter-spacing:.05em;">Statutory TDS Rates</span>
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small" for="admin-194h">194H (Commission)</label>
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control form-control-sm" id="admin-194h" value="0.20" step="0.01" />
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small" for="admin-194c">194C (Contractor)</label>
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control form-control-sm" id="admin-194c" value="0.05" step="0.01" />
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small" for="admin-194nf">194NF (Cash W/D)</label>
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control form-control-sm" id="admin-194nf" value="0.012" step="0.001" />
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ SECTION: BANK & PAYROLL MASTERS ═══ -->
+
+        <!-- Bank Configurations -->
+        <div class="col-lg-6 admin-card-item" data-admin-sec="masters">
+          <div class="card-panel h-100">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-success" aria-hidden="true"><i class="bi bi-bank"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Bank Configurations</h6>
+                  <p class="panel-subtitle">Auto-fetch bank address, IFSC &amp; official Brandfetch logos</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body p-3">
+              <!-- Add Bank Form with IFSC & Brandfetch Integration -->
+              <div class="admin-add-bank-box mb-3">
+                <div class="row g-2 mb-2">
+                  <div class="col-sm-4">
+                    <div class="input-group input-group-sm">
+                      <input type="text" class="form-control form-control-sm text-uppercase font-monospace" id="admin-new-bank-ifsc" placeholder="IFSC (e.g. SBIN0011371)" maxlength="11" oninput="App.onAdminIFSCInput(this.value)" />
+                      <button class="btn btn-outline-primary btn-sm px-2" type="button" onclick="App.lookupAdminIFSC()" title="Auto-fetch details by IFSC"><i class="bi bi-search"></i></button>
+                    </div>
+                  </div>
+                  <div class="col-sm-5">
+                    <input type="text" class="form-control form-control-sm text-uppercase" id="admin-new-bank-name" placeholder="Bank Name" oninput="App.previewBankLogo(this.value,'bank-logo-preview')" />
+                  </div>
+                  <div class="col-sm-3 d-flex align-items-center justify-content-end gap-1">
+                    <div class="slip-comp-logo-preview" id="bank-logo-preview" title="Brandfetch Logo">
+                      <span>B</span>
+                    </div>
+                    <label class="btn btn-outline-secondary btn-sm mb-0 px-2" title="Upload custom logo image"><i class="bi bi-image"></i><input type="file" accept="image/*" hidden id="bank-logo-upload" onchange="App.uploadBankLogo(this)" /></label>
+                    <button class="btn btn-info btn-sm text-white" onclick="App.fetchBrandfetchBankLogo()" title="Fetch Logo from Brandfetch"><i class="bi bi-cloud-arrow-down-fill"></i></button>
+                  </div>
+                </div>
+
+                <div class="row g-2 align-items-center">
+                  <div class="col-sm-4">
+                    <input type="text" class="form-control form-control-sm text-uppercase" id="admin-new-bank-branch" placeholder="Branch Name (e.g. BERACHAMPA)" />
+                  </div>
+                  <div class="col-sm-5">
+                    <input type="text" class="form-control form-control-sm text-uppercase" id="admin-new-bank-address" placeholder="Branch Full Address" />
+                  </div>
+                  <div class="col-sm-3 d-flex gap-1">
+                    <button class="btn btn-primary btn-sm flex-grow-1" onclick="App.addBankConfig()"><i class="bi bi-plus-lg"></i> Add</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="App.addPresetBanks()" title="Add preset banks with logos"><i class="bi bi-lightning-fill"></i></button>
+                  </div>
+                </div>
+                <div id="admin-ifsc-status" class="small mt-1" style="min-height:16px;"></div>
+              </div>
+
+              <div class="mb-2">
+                <input type="text" class="form-control form-control-sm" id="admin-bank-search" placeholder="Search banks, branches or IFSC..." oninput="App.filterBankConfigs()" />
+              </div>
+              <div id="admin-bank-list" class="ded-admin-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Salary Slip Companies -->
+        <div class="col-lg-6 admin-card-item" data-admin-sec="masters">
+          <div class="card-panel h-100">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-primary" aria-hidden="true"><i class="bi bi-building"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Salary Slip Companies</h6>
+                  <p class="panel-subtitle">Employer profiles for payslip generation</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body p-3">
+              <div class="admin-add-bank-box mb-3">
+                <div class="row g-2 mb-2">
+                  <div class="col-sm-5">
+                    <input type="text" class="form-control form-control-sm text-uppercase" id="admin-new-slip-comp-name" placeholder="Company Name" oninput="App.previewAutoLogo(this.value,'slip-logo-preview')" />
+                  </div>
+                  <div class="col-sm-5">
+                    <input type="text" class="form-control form-control-sm" id="admin-new-slip-comp-addr" placeholder="Company Full Address" />
+                  </div>
+                  <div class="col-sm-2 d-flex align-items-center justify-content-end gap-1">
+                    <div class="slip-comp-logo-preview" id="slip-logo-preview"><span>C</span></div>
+                    <button class="btn btn-outline-success btn-sm px-2" onclick="App.autoGenSlipLogo()" title="Auto-generate logo"><i class="bi bi-magic"></i></button>
+                    <label class="btn btn-outline-secondary btn-sm mb-0 px-2" title="Upload custom logo"><i class="bi bi-image"></i><input type="file" accept="image/*" hidden id="slip-comp-logo-upload" onchange="App.uploadSlipLogo(this)" /></label>
+                  </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control form-control-sm" id="admin-new-slip-comp-phone" placeholder="Phone" />
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control form-control-sm" id="admin-new-slip-comp-email" placeholder="Email (opt)" />
+                  </div>
+                  <div class="col-sm-4">
+                    <input type="text" class="form-control form-control-sm" id="admin-new-slip-comp-tagline" placeholder="Tagline (opt)" />
+                  </div>
+                  <div class="col-sm-2 d-flex">
+                    <button class="btn btn-primary btn-sm flex-grow-1" onclick="App.addSlipCompany()"><i class="bi bi-plus-lg"></i> Add</button>
+                  </div>
+                </div>
+              </div>
+              <div id="admin-slip-comp-list" class="ded-admin-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ SECTION: DEDUCTORS & TAX RULES ═══ -->
+
+        <!-- Deductor Configurations -->
+        <div class="col-lg-6 admin-card-item" data-admin-sec="tax">
+          <div class="card-panel h-100">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-warning" aria-hidden="true"><i class="bi bi-person-badge-fill"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Deductor Configurations</h6>
+                  <p class="panel-subtitle">Custom TDS deductor profiles &amp; TAN records</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body p-3">
+              <div class="admin-add-bank-box mb-3">
+                <div class="row g-2">
+                  <div class="col-sm-4">
+                    <input type="text" class="form-control form-control-sm text-uppercase" id="admin-new-deductor-name" placeholder="Deductor Name" />
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control form-control-sm text-uppercase font-monospace" id="admin-new-deductor-tan" placeholder="TAN (10-char)" maxlength="10" />
+                  </div>
+                  <div class="col-sm-3">
+                    <select class="form-select form-select-sm" id="admin-new-deductor-cat">
+                      <option value="Company">Company</option>
+                      <option value="Bank">Bank</option>
+                      <option value="Payment Gateway">Payment Gateway</option>
+                      <option value="Government">Government</option>
+                      <option value="Logistics">Logistics</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-2 d-flex gap-1">
+                    <button class="btn btn-primary btn-sm flex-grow-1" onclick="App.addCustomDeductor()"><i class="bi bi-plus-lg"></i></button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="App.addPresetDeductors()" title="Add preset deductors"><i class="bi bi-lightning-fill"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-2">
+                <input type="text" class="form-control form-control-sm" id="admin-deductor-search" placeholder="Search deductors or TAN..." oninput="App.filterDeductors()" />
+              </div>
+              <div id="admin-deductor-list" class="ded-admin-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nature of Business Codes -->
+        <div class="col-lg-6 admin-card-item" data-admin-sec="tax">
+          <div class="card-panel h-100">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-danger" aria-hidden="true"><i class="bi bi-sliders"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Nature of Business Codes</h6>
+                  <p class="panel-subtitle">ITR business activity trade codes</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body p-3">
+              <div class="admin-add-bank-box mb-3">
+                <div class="row g-2">
+                  <div class="col-sm-6">
+                    <input type="text" class="form-control form-control-sm text-uppercase" id="admin-new-nature" placeholder="Trade / Nature (e.g. RETAIL TRADE)" />
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control form-control-sm font-monospace" id="admin-new-nature-code" placeholder="Code (e.g. 0204)" />
+                  </div>
+                  <div class="col-sm-3 d-flex gap-1">
+                    <button class="btn btn-primary btn-sm flex-grow-1" onclick="App.addNatureCode()"><i class="bi bi-plus-lg"></i> Add</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="App.addPresetNatureCodes()" title="Add preset codes"><i class="bi bi-lightning-fill"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-2">
+                <input type="text" class="form-control form-control-sm" id="admin-nature-search" placeholder="Search trade names or codes..." oninput="App.filterNatureCodes()" />
+              </div>
+              <div id="admin-nature-list" class="ded-admin-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assessment Year Rules & Custom AYs (Combined Card) -->
+        <div class="col-lg-12 admin-card-item" data-admin-sec="tax">
+          <div class="card-panel">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-primary" aria-hidden="true"><i class="bi bi-calendar2-check-fill"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Assessment Year Rules &amp; Custom AYs</h6>
+                  <p class="panel-subtitle">Slabs, 87A rebate rules &amp; dropdown AY entries</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body p-3">
+              <div class="row g-4">
+                <div class="col-lg-8">
+                  <div class="table-responsive border rounded">
+                    <table class="table table-sm ay-table mb-0" id="ayTable">
+                      <thead>
+                        <tr>
+                          <th scope="col">Assessment Year</th>
+                          <th scope="col">Default Regime</th>
+                          <th scope="col">Sec 87A Rebate</th>
+                          <th scope="col">Basic Exemption</th>
+                        </tr>
+                      </thead>
+                      <tbody id="ayTbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="admin-add-bank-box h-100">
+                    <label class="form-label small fw-semibold">Add Custom Assessment Year</label>
+                    <div class="input-group input-group-sm mb-3">
+                      <input type="text" class="form-control font-monospace" id="admin-new-ay" placeholder="e.g. 2027-28" aria-label="New assessment year" />
+                      <button class="btn btn-primary" onclick="App.addCustomAY()"><i class="bi bi-plus-lg me-1"></i>Add</button>
+                    </div>
+                    <label class="form-label small fw-semibold text-muted">Configured Assessment Years</label>
+                    <ul class="admin-ay-list list-unstyled" id="admin-ay-list"></ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ SECTION: BACKUP & DATA MANAGEMENT ═══ -->
+
+        <!-- Local Backup & Restore -->
+        <div class="col-lg-12 admin-card-item" data-admin-sec="backup">
+          <div class="card-panel backup-panel">
+            <div class="panel-header">
+              <div class="panel-header-left">
+                <div class="panel-icon panel-icon-primary" aria-hidden="true"><i class="bi bi-database-fill-gear"></i></div>
+                <div>
+                  <h6 class="panel-title-text">Project Data Hub &amp; Stored Assets</h6>
+                  <p class="panel-subtitle">Manage all local computations, bank statements, payslips, company records, and offline bank logos</p>
+                </div>
+              </div>
+              <span class="backup-local-badge"><i class="bi bi-check-circle-fill text-success me-1"></i> 100% Stored Locally</span>
+            </div>
+            <div class="panel-body p-3">
+              <!-- Live Storage Breakdown Metrics -->
+              <div class="row g-3 mb-4">
+                <div class="col-md-3 col-sm-6">
+                  <div class="p-3 border rounded bg-surface-subtle h-100 d-flex flex-column justify-content-between">
+                    <div>
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small fw-bold"><i class="bi bi-file-earmark-text me-1 text-primary"></i> Generated ITRs</span>
+                        <span class="badge bg-primary-subtle text-primary" id="store-itr-count">0</span>
+                      </div>
+                      <div class="small text-muted mb-2">Saved tax computations</div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="App.downloadAllClients()">
+                      <i class="bi bi-download me-1"></i>Export ITRs
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                  <div class="p-3 border rounded bg-surface-subtle h-100 d-flex flex-column justify-content-between">
+                    <div>
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small fw-bold"><i class="bi bi-bank me-1 text-info"></i> Bank Statements</span>
+                        <span class="badge bg-info-subtle text-info" id="store-stmt-count">0</span>
+                      </div>
+                      <div class="small text-muted mb-2">Business &amp; Salaried statements</div>
+                    </div>
+                    <button type="button" class="btn btn-outline-info btn-sm w-100" onclick="App.downloadAllStatements()">
+                      <i class="bi bi-download me-1"></i>Export Statements
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                  <div class="p-3 border rounded bg-surface-subtle h-100 d-flex flex-column justify-content-between">
+                    <div>
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small fw-bold"><i class="bi bi-file-earmark-person me-1 text-success"></i> Salary Slips</span>
+                        <span class="badge bg-success-subtle text-success" id="store-slip-count">0</span>
+                      </div>
+                      <div class="small text-muted mb-2">Generated payroll records</div>
+                    </div>
+                    <button type="button" class="btn btn-outline-success btn-sm w-100" onclick="App.downloadAllSlips()">
+                      <i class="bi bi-download me-1"></i>Export Payslips
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                  <div class="p-3 border rounded bg-surface-subtle h-100 d-flex flex-column justify-content-between">
+                    <div>
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small fw-bold"><i class="bi bi-building me-1 text-warning"></i> Companies</span>
+                        <span class="badge bg-warning-subtle text-warning" id="store-comp-count">0</span>
+                      </div>
+                      <div class="small text-muted mb-2">Registered company profiles</div>
+                    </div>
+                    <button type="button" class="btn btn-outline-warning btn-sm w-100" onclick="App.downloadAllCompanies()">
+                      <i class="bi bi-download me-1"></i>Export Companies
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Master Full Project Backup & Restore -->
+              <div class="backup-grid">
+                <div class="backup-action-card">
+                  <div class="backup-action-icon"><i class="bi bi-cloud-arrow-down-fill"></i></div>
+                  <div class="backup-action-content">
+                    <h6>Download Full Project Backup</h6>
+                    <p>Export all client ITRs, generated bank statements, payslips, company logos, bank masters, and admin configurations into a master JSON backup file.</p>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="App.downloadLocalBackup()">
+                      <i class="bi bi-download me-1"></i>Download Master Backup
+                    </button>
+                  </div>
+                </div>
+                <div class="backup-action-card backup-restore-card">
+                  <div class="backup-action-icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+                  <div class="backup-action-content">
+                    <h6>Restore Project Data from File</h6>
+                    <p>Import and restore a previously saved JSON backup file to load all records, statements, payslips, and database settings.</p>
+                    <input type="file" id="admin-backup-file" accept="application/json,.json" hidden onchange="App.restoreLocalBackup(this)" />
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('admin-backup-file').click()">
+                      <i class="bi bi-folder2-open me-1"></i>Select Backup File
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="backup-notice mt-3">
+                <i class="bi bi-shield-check text-success" aria-hidden="true"></i>
+                <span><strong>Offline &amp; Embedded:</strong> All bank logos (SBI, HDFC, ICICI, Axis, Kotak, PNB, BOB, Canara, etc.), generated ITRs, bank statements, and payslips are stored directly in this project.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.row -->
+    </section>
+
+    <!-- ════════════════════════════════════════════════════
+         PAGE: SALARY SLIP
+         ════════════════════════════════════════════════════ -->
+    <section id="page-salary-slip" class="page" aria-label="Salary Slip Generator">
+
+      <div class="ss-page-header">
+        <div>
+          <h4 class="ss-page-title"><i class="bi bi-file-earmark-person-fill me-2"></i>Salary Slip Generator</h4>
+          <p class="ss-page-sub">Select company, fill employee details, and generate payslip</p>
+        </div>
+        <div class="ss-header-actions">
+          <button class="btn btn-outline-secondary btn-sm" onclick="App.resetSlipForm()"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
+          <button class="btn btn-success btn-sm" onclick="App.saveSlipEmployee()"><i class="bi bi-save-fill me-1"></i>Save</button>
+          <button class="btn btn-primary btn-sm" onclick="App.generateSalarySlip()"><i class="bi bi-printer-fill me-1"></i>Generate & Print</button>
+        </div>
+      </div>
+
+      <!-- Company & Month Row -->
+      <div class="ss-section">
+        <div class="ss-section-header d-flex justify-content-between align-items-center">
+          <div><i class="bi bi-building"></i> Company &amp; Pay Period</div>
+          <span id="ss-months-badge" class="badge bg-primary-subtle text-primary fw-semibold">1 Month Selected (April)</span>
+        </div>
+        <div class="ss-section-body">
+          <div class="ss-form-grid ss-form-grid-2 mb-3">
+            <div class="ss-field">
+              <label class="ss-label">Company <span class="ss-required">*</span></label>
+              <select class="form-select form-select-sm" id="ss-company">
+                <option value="">— Select Company —</option>
+              </select>
+            </div>
+            <div class="ss-field">
+              <label class="ss-label">Year <span class="ss-required">*</span></label>
+              <select class="form-select form-select-sm" id="ss-year"></select>
+            </div>
+          </div>
+
+          <!-- Multi-Month Selector Matrix -->
+          <div class="ss-month-selector-card p-3 border rounded mb-2 bg-surface-subtle">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+              <label class="ss-label mb-0 fw-bold"><i class="bi bi-calendar3 me-1 text-primary"></i> Select Pay Period Months (Select Multiple at Once) <span class="ss-required">*</span></label>
+              <div class="btn-group btn-group-sm" role="group" aria-label="Month selection presets">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="App.selectSlipMonthsPreset('all')">All (12M)</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="App.selectSlipMonthsPreset('last3')">Last 3M</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="App.selectSlipMonthsPreset('last6')">Last 6M</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="App.selectSlipMonthsPreset('fy')">FY (Apr–Mar)</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="App.selectSlipMonthsPreset('clear')">Clear</button>
+              </div>
+            </div>
+            
+            <div class="ss-months-grid" id="ss-months-grid">
+              <!-- Rendered dynamically by JS -->
+            </div>
+
+            <!-- Hidden input for single month fallback compatibility -->
+            <select class="d-none" id="ss-month">
+              <option value="January">January</option><option value="February">February</option>
+              <option value="March">March</option><option value="April" selected>April</option>
+              <option value="May">May</option><option value="June">June</option>
+              <option value="July">July</option><option value="August">August</option>
+              <option value="September">September</option><option value="October">October</option>
+              <option value="November">November</option><option value="December">December</option>
+            </select>
+
+            <div class="small text-muted mt-2 d-flex align-items-center gap-1">
+              <i class="bi bi-info-circle text-primary"></i>
+              <span>Select any combination of months above. <strong>Generate &amp; Print</strong> will generate, store, and print all selected months' payslips at once.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Salary Mode: Auto-fill or Manual -->
+      <div class="ss-section">
+        <div class="ss-section-header"><i class="bi bi-cash-coin"></i> Salary Entry</div>
+        <div class="ss-section-body">
+          <div class="ss-mode-toggle">
+            <button class="ss-mode-btn active" id="ss-mode-auto" onclick="App.setSlipMode('auto')">
+              <i class="bi bi-lightning-fill"></i> Auto-fill Salary
+            </button>
+            <button class="ss-mode-btn" id="ss-mode-manual" onclick="App.setSlipMode('manual')">
+              <i class="bi bi-pencil-square"></i> Manual Entry
+            </button>
+          </div>
+
+          <!-- Auto-fill Panel -->
+          <div class="ss-mode-panel active" id="ss-auto-panel">
+            <div class="ss-form-grid ss-form-grid-3" style="margin-top:14px">
+              <div class="ss-field">
+                <label class="ss-label">Gross Salary (₹) <span class="ss-required">*</span></label>
+                <input type="number" class="form-control form-control-sm" id="ss-gross-salary" placeholder="e.g. 30000" min="0" oninput="App.previewSlipAuto()" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">City Type</label>
+                <select class="form-select form-select-sm" id="ss-city-type" onchange="App.previewSlipAuto()">
+                  <option value="metro">Metro (HRA 50%)</option>
+                  <option value="non-metro">Non-Metro (HRA 40%)</option>
+                </select>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">PF Applicable</label>
+                <select class="form-select form-select-sm" id="ss-pf-applicable" onchange="App.previewSlipAuto()">
+                  <option value="yes">Yes (12% of Basic)</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+            <div class="ss-auto-breakdown" id="ss-auto-breakdown">
+              <div class="ss-auto-item"><span>Basic (40%)</span><strong id="ss-auto-basic">₹ 0</strong></div>
+              <div class="ss-auto-item"><span>HRA</span><strong id="ss-auto-hra">₹ 0</strong></div>
+              <div class="ss-auto-item"><span>Special Allow.</span><strong id="ss-auto-special">₹ 0</strong></div>
+              <div class="ss-auto-item"><span>PF (12%)</span><strong id="ss-auto-pf">₹ 0</strong></div>
+              <div class="ss-auto-item"><span>Prof. Tax</span><strong id="ss-auto-pt">₹ 0</strong></div>
+              <div class="ss-auto-item ss-auto-net"><span>Net Pay</span><strong id="ss-auto-net">₹ 0</strong></div>
+            </div>
+            <div style="margin-top:12px">
+              <button class="btn btn-success btn-sm" onclick="App.applyAutoFill()"><i class="bi bi-check-circle-fill me-1"></i>Apply to Earnings & Deductions</button>
+            </div>
+          </div>
+
+          <!-- Manual Panel -->
+          <div class="ss-mode-panel" id="ss-manual-panel">
+            <p class="text-muted" style="font-size:12px;margin:10px 0 0">Enter earnings and deductions manually in the sections below.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employee Details -->
+      <div class="ss-section">
+        <div class="ss-section-header"><i class="bi bi-person-badge-fill"></i> Employee Details</div>
+        <div class="ss-section-body">
+          <div class="ss-form-grid">
+            <div class="ss-field"><label class="ss-label">Employee ID <small class="text-muted">(auto)</small></label><input type="text" class="form-control form-control-sm text-uppercase" id="ss-emp-id" placeholder="Auto-generated" style="background:rgba(99,102,241,.05)" /></div>
+            <div class="ss-field"><label class="ss-label">Employee Name <span class="ss-required">*</span></label><input type="text" class="form-control form-control-sm text-uppercase" id="ss-emp-name" placeholder="Full Name" /></div>
+            <div class="ss-field"><label class="ss-label">Location</label><input type="text" class="form-control form-control-sm text-uppercase" id="ss-emp-location" placeholder="e.g. Kolkata" /></div>
+            <div class="ss-field"><label class="ss-label">Division</label><input type="text" class="form-control form-control-sm text-uppercase" id="ss-emp-division" placeholder="e.g. Kolkata East" /></div>
+            <div class="ss-field"><label class="ss-label">Designation</label><input type="text" class="form-control form-control-sm text-uppercase" id="ss-emp-designation" placeholder="e.g. Manager" /></div>
+            <div class="ss-field"><label class="ss-label">Date of Joining</label><input type="date" class="form-control form-control-sm" id="ss-emp-doj" /></div>
+            <div class="ss-field"><label class="ss-label">UAN</label><input type="text" class="form-control form-control-sm" id="ss-emp-uan" placeholder="12-digit UAN" maxlength="12" /></div>
+            <div class="ss-field"><label class="ss-label">ESIC No</label><input type="text" class="form-control form-control-sm" id="ss-emp-esic" placeholder="ESIC Number" /></div>
+            <div class="ss-field"><label class="ss-label">PAN No</label><input type="text" class="form-control form-control-sm text-uppercase" id="ss-emp-pan" placeholder="PAN" maxlength="10" /></div>
+          </div>
+          <div class="ss-form-grid" style="margin-top:10px">
+            <div class="ss-field"><label class="ss-label">Bank Name</label><input type="text" class="form-control form-control-sm text-uppercase" id="ss-emp-bank" placeholder="Bank Name" /></div>
+            <div class="ss-field"><label class="ss-label">Bank A/c No</label><input type="text" class="form-control form-control-sm" id="ss-emp-acno" placeholder="Account Number" /></div>
+            <div class="ss-field"><label class="ss-label">IFSC Code</label><input type="text" class="form-control form-control-sm text-uppercase" id="ss-emp-ifsc" placeholder="IFSC" maxlength="11" /></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance -->
+      <div class="ss-section">
+        <div class="ss-section-header"><i class="bi bi-calendar-check"></i> Attendance</div>
+        <div class="ss-section-body">
+          <div class="ss-form-grid ss-form-grid-3">
+            <div class="ss-field"><label class="ss-label">Total Days in Month</label><input type="number" class="form-control form-control-sm" id="ss-total-days" value="30" min="1" max="31" oninput="App.calcSlipNet()" /></div>
+            <div class="ss-field"><label class="ss-label">Days Paid</label><input type="number" class="form-control form-control-sm" id="ss-days-paid" value="30" min="0" max="31" oninput="this.dataset.userEdited='1';App.calcSlipNet()" /></div>
+            <div class="ss-field"><label class="ss-label">Loss of Pay</label><input type="number" class="form-control form-control-sm" id="ss-lop" value="0" min="0" max="31" oninput="App.calcSlipNet()" /></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earnings & Deductions -->
+      <div class="ss-two-col">
+        <!-- Earnings -->
+        <div class="ss-section">
+          <div class="ss-section-header"><i class="bi bi-cash-stack"></i> Earnings</div>
+          <div class="ss-section-body">
+            <div id="ss-earnings-list">
+              <div class="ss-earn-row" data-type="basic">
+                <input type="text" class="form-control form-control-sm" value="Basic" readonly />
+                <input type="number" class="form-control form-control-sm ss-earning-actual" value="0" min="0" oninput="App.calcSlipNet()" placeholder="Actual" />
+                <input type="number" class="form-control form-control-sm ss-earning-salary" value="0" min="0" oninput="App.calcSlipNet()" placeholder="Salary" />
+              </div>
+              <div class="ss-earn-row" data-type="hra">
+                <input type="text" class="form-control form-control-sm" value="HRA" readonly />
+                <input type="number" class="form-control form-control-sm ss-earning-actual" value="0" min="0" oninput="App.calcSlipNet()" placeholder="Actual" />
+                <input type="number" class="form-control form-control-sm ss-earning-salary" value="0" min="0" oninput="App.calcSlipNet()" placeholder="Salary" />
+              </div>
+              <div class="ss-earn-row" data-type="special">
+                <input type="text" class="form-control form-control-sm" value="Special Allowance" readonly />
+                <input type="number" class="form-control form-control-sm ss-earning-actual" value="0" min="0" oninput="App.calcSlipNet()" placeholder="Actual" />
+                <input type="number" class="form-control form-control-sm ss-earning-salary" value="0" min="0" oninput="App.calcSlipNet()" placeholder="Salary" />
+              </div>
+            </div>
+            <div class="ss-add-row">
+              <input type="text" class="form-control form-control-sm" id="ss-new-earn-name" placeholder="Earning name" />
+              <input type="number" class="form-control form-control-sm" id="ss-new-earn-actual" placeholder="Actual" min="0" />
+              <input type="number" class="form-control form-control-sm" id="ss-new-earn-salary" placeholder="Salary" min="0" />
+              <button class="btn btn-sm btn-primary" onclick="App.addSlipEarning()"><i class="bi bi-plus"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deductions -->
+        <div class="ss-section">
+          <div class="ss-section-header"><i class="bi bi-dash-circle"></i> Deductions</div>
+          <div class="ss-section-body">
+            <div id="ss-deductions-list">
+              <div class="ss-ded-row" data-type="pf">
+                <input type="text" class="form-control form-control-sm" value="Employee PF" readonly />
+                <input type="number" class="form-control form-control-sm ss-deduction-amt" value="0" min="0" oninput="App.calcSlipNet()" placeholder="Deducted" />
+              </div>
+            </div>
+            <div class="ss-add-row">
+              <input type="text" class="form-control form-control-sm" id="ss-new-ded-name" placeholder="Deduction name" />
+              <input type="number" class="form-control form-control-sm" id="ss-new-ded-amt" placeholder="Amount" min="0" />
+              <button class="btn btn-sm btn-primary" onclick="App.addSlipDeduction()"><i class="bi bi-plus"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals & Net Pay -->
+      <div class="ss-section">
+        <div class="ss-section-header"><i class="bi bi-calculator-fill"></i> Summary</div>
+        <div class="ss-section-body">
+          <div class="ss-summary-row">
+            <div class="ss-summary-item ss-earn-total"><span>Total Earning</span><strong id="ss-total-earning">₹ 0.00</strong></div>
+            <div class="ss-summary-item ss-ded-total"><span>Total Deduction</span><strong id="ss-total-deduction">₹ 0.00</strong></div>
+            <div class="ss-summary-item ss-net-pay"><span>Net Pay</span><strong id="ss-net-pay">₹ 0.00</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved Salary Slips -->
+      <div class="ss-section">
+        <div class="ss-section-header"><i class="bi bi-folder2-open"></i> Saved Salary Slips</div>
+        <div class="ss-section-body">
+          <div class="ss-saved-filters d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+              <select class="form-select form-select-sm" id="ss-filter-comp" onchange="App.renderSavedSlips()" style="width:auto">
+                <option value="">All Companies</option>
+              </select>
+              <input type="search" class="form-control form-control-sm" id="ss-filter-search" placeholder="Search name, emp code..." oninput="App.renderSavedSlips()" style="width:220px" />
+            </div>
+            <button class="btn btn-outline-primary btn-sm" onclick="App.downloadAllSlips()" title="Export All Salary Slips (JSON)">
+              <i class="bi bi-download me-1"></i>Export All Payslips
+            </button>
+          </div>
+          <div id="ss-saved-list"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════════════
+         PAGE: BANK STATEMENT
+         ════════════════════════════════════════════════════ -->
+    <section id="page-bank-statement" class="page" aria-label="Bank Statement Generator">
+
+      <div class="ss-page-header">
+        <div>
+          <h4 class="ss-page-title"><i class="bi bi-bank me-2"></i>Bank Statement Generator</h4>
+          <p class="ss-page-sub">Generate authentic bank statements for Business or Salaried individuals with real-time balance safeguards</p>
+        </div>
+        <div class="ss-header-actions">
+          <button class="btn btn-outline-secondary btn-sm" onclick="App.resetBankStatementForm()"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
+          <button class="btn btn-success btn-sm" onclick="App.generateBankStatement()"><i class="bi bi-printer-fill me-1"></i>Generate & Print PDF</button>
+        </div>
+      </div>
+
+      <!-- Persona Selector: Business Person vs Salaried Person -->
+      <div class="ss-mode-toggle mb-3" style="max-width: 540px;">
+        <button class="ss-mode-btn active" id="bs-persona-business" onclick="App.setBankStatementPersona('business')">
+          <i class="bi bi-briefcase-fill"></i> Business Person
+        </button>
+        <button class="ss-mode-btn" id="bs-persona-salary" onclick="App.setBankStatementPersona('salary')">
+          <i class="bi bi-person-badge-fill"></i> Salaried Person
+        </button>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════
+           1. BUSINESS PERSON PANEL (Full Current Process)
+           ══════════════════════════════════════════════════ -->
+      <div class="ss-mode-panel active" id="bs-panel-business">
+
+        <!-- Bank & Account Details -->
+        <div class="ss-section">
+          <div class="ss-section-header"><i class="bi bi-bank2"></i> Bank & Account Details (Business Account)</div>
+          <div class="ss-section-body">
+            <div class="ss-form-grid">
+              <div class="ss-field">
+                <label class="ss-label">Statement Style <span class="ss-required">*</span></label>
+                <select class="form-select form-select-sm" id="bs-style">
+                  <option value="icici" selected>ICICI Detailed Statement (PDF Replica)</option>
+                  <option value="standard">Standard Modern Statement</option>
+                </select>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Bank Name <span class="ss-required">*</span></label>
+                <div class="d-flex gap-1 align-items-center">
+                  <input type="text" class="form-control form-control-sm text-uppercase flex-grow-1" id="bs-bank" list="bs-bank-list" placeholder="Bank Name (or select from list)" oninput="App.previewBankLogo(this.value, 'bs-logo-preview')" value="ICICI BANK" />
+                  <datalist id="bs-bank-list"></datalist>
+                  <div class="slip-comp-logo-preview ms-1" id="bs-logo-preview" style="width:32px;height:32px;min-width:32px;border-radius:4px;" title="Bank Logo"><span>B</span></div>
+                  <label class="btn btn-outline-primary btn-sm mb-0 px-2" title="Upload Custom Bank Logo"><i class="bi bi-image"></i><input type="file" accept="image/*" hidden id="bs-logo-upload" onchange="App.uploadStatementBankLogo(this)" /></label>
+                </div>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Account Type</label>
+                <select class="form-select form-select-sm" id="bs-actype">
+                  <option value="CAA" selected>CAA - Current Account</option>
+                  <option value="CA">CA - Corporate Account</option>
+                  <option value="OD">OD - Overdraft Account</option>
+                  <option value="SB">SB - Savings Account</option>
+                  <option value="SALARY">SALARY - Salary Account</option>
+                  <option value="SB - SALARY">SB - Salary Account</option>
+                </select>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Account Holder Name <span class="ss-required">*</span></label>
+                <input type="text" class="form-control form-control-sm text-uppercase" id="bs-holder" placeholder="Full Name" value="MUKUL RAHAMAN" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Account Number <span class="ss-required">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="bs-acno" placeholder="Account Number" value="091405003332" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Customer ID (Cust ID)</label>
+                <input type="text" class="form-control form-control-sm" id="bs-custid" placeholder="e.g. 573886835" value="573886835" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">IFSC Code</label>
+                <div class="input-group input-group-sm">
+                  <input type="text" class="form-control form-control-sm text-uppercase font-monospace" id="bs-ifsc" placeholder="IFSC" maxlength="11" value="ICIC0000914" oninput="App.onStatementIFSCInput(this.value)" onchange="App.onStatementIFSCInput(this.value)" />
+                  <button class="btn btn-outline-primary btn-sm px-2" type="button" onclick="App.lookupStatementIFSC()" title="Auto-fetch Bank, Branch, Address &amp; Logo by IFSC"><i class="bi bi-search"></i></button>
+                </div>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Branch Name / Code</label>
+                <div class="input-group input-group-sm">
+                  <input type="text" class="form-control form-control-sm text-uppercase" id="bs-branch" placeholder="Branch Name" value="BASIRHAT" />
+                  <input type="text" class="form-control form-control-sm text-uppercase" id="bs-branchcode" placeholder="Code" style="max-width:85px" value="0914" />
+                </div>
+              </div>
+              <div class="ss-field" style="grid-column: 1 / -1;">
+                <label class="ss-label">Customer Address</label>
+                <input type="text" class="form-control form-control-sm text-uppercase" id="bs-holderaddress" placeholder="Holder Address" value="CHOWRASHI, DEGANGA, CHAURASHI, NORTH 24 PARGANAS, 743424, WEST BENGAL, INDIA" />
+              </div>
+              <div class="ss-field" style="grid-column: 1 / -1;">
+                <label class="ss-label">Branch Address</label>
+                <input type="text" class="form-control form-control-sm text-uppercase" id="bs-branchaddress" placeholder="Branch Address" value="ICICI BANK LTD., BASIRHAT BRANCH, BHAWANIPUR, PO.-BASIRHAT COLLEGE, DIST.- 24 PARGANAS (NORTH).743 412, NORTH 24 PARGANAS, WEST BENGAL, INDIA" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date Range & Balance -->
+        <div class="ss-section">
+          <div class="ss-section-header"><i class="bi bi-calendar-range"></i> Statement Period & Balance</div>
+          <div class="ss-section-body">
+            <div class="ss-form-grid ss-form-grid-4">
+              <div class="ss-field">
+                <label class="ss-label">From Date <span class="ss-required">*</span></label>
+                <input type="date" class="form-control form-control-sm" id="bs-from" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">To Date <span class="ss-required">*</span></label>
+                <input type="date" class="form-control form-control-sm" id="bs-to" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Monthly Txn Density <span class="badge bg-primary-subtle text-primary ms-1">&gt;25/Mo</span></label>
+                <select class="form-select form-select-sm" id="bs-density">
+                  <option value="30" selected>28–35 Txns / Month (Recommended)</option>
+                  <option value="40">35–45 Txns / Month (High Volume)</option>
+                  <option value="50">50+ Txns / Month (Heavy Trading / Real PDF Level)</option>
+                  <option value="15">12–18 Txns / Month (Light)</option>
+                </select>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Opening Balance (₹)</label>
+                <input type="number" class="form-control form-control-sm" id="bs-opening" value="30211" min="0" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Minimum Daily Balance (₹)</label>
+                <input type="number" class="form-control form-control-sm" id="bs-min-balance" value="25000" min="0" />
+              </div>
+              <div class="ss-field d-flex align-items-end" style="grid-column: span 3;">
+                <div class="form-text mb-2 text-muted"><i class="bi bi-shield-check text-success me-1"></i>Business statement balances will be auto-calculated with real-time running balance tracking and minimum balance safeguards.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transactions -->
+        <div class="ss-section">
+          <div class="ss-section-header d-flex justify-content-between align-items-center">
+            <div><i class="bi bi-list-columns"></i> Statement Transactions (<span id="stmt-tx-count">0</span> rows)</div>
+          </div>
+          <div class="ss-section-body">
+            <div class="d-flex gap-2 mb-3 align-items-center flex-wrap">
+              <button class="btn btn-primary btn-sm" onclick="App.autoGenStatementTxs()"><i class="bi bi-magic me-1"></i>Auto-generate Transactions (&gt;25/Month from PDF Remarks)</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="App.addStatementTxnRow()"><i class="bi bi-plus-lg me-1"></i>Add Row</button>
+              <button class="btn btn-outline-danger btn-sm" onclick="App.clearStatementTxns()"><i class="bi bi-trash me-1"></i>Clear All</button>
+            </div>
+            <div class="stmt-tx-head">
+              <span>Tran ID</span>
+              <span>Date</span>
+              <span>Remarks / Narration (PDF Format)</span>
+              <span>Withdrawal (Dr)</span>
+              <span>Deposit (Cr)</span>
+              <span>Balance</span>
+              <span></span>
+            </div>
+            <div id="stmt-tx-list" style="max-height: 480px; overflow-y: auto;"></div>
+            <div class="stmt-summary">
+              <div class="stmt-summary-item"><span>Opening</span><strong id="stmt-open-total">₹ 0.00</strong></div>
+              <div class="stmt-summary-item"><span>Total Withdrawals</span><strong id="stmt-dr-total">₹ 0.00</strong></div>
+              <div class="stmt-summary-item"><span>Total Deposits</span><strong id="stmt-cr-total">₹ 0.00</strong></div>
+              <div class="stmt-summary-item stmt-summary-close"><span>Closing</span><strong id="stmt-close-total">₹ 0.00</strong></div>
+            </div>
+            <div class="stmt-min-note" id="stmt-min-note"></div>
+          </div>
+        </div>
+
+        <!-- Saved Statements -->
+        <div class="ss-section">
+          <div class="ss-section-header d-flex justify-content-between align-items-center">
+            <div><i class="bi bi-folder2-open"></i> Saved Business Statements</div>
+            <button class="btn btn-outline-primary btn-sm" onclick="App.downloadAllStatements()" title="Export All Statements (JSON)">
+              <i class="bi bi-download me-1"></i>Export All Statements
+            </button>
+          </div>
+          <div class="ss-section-body">
+            <div id="stmt-saved-list"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══════════════════════════════════════════════════
+           2. SALARIED PERSON PANEL
+           ══════════════════════════════════════════════════ -->
+      <div class="ss-mode-panel" id="bs-panel-salary">
+
+        <!-- Bank & Account Details -->
+        <div class="ss-section">
+          <div class="ss-section-header"><i class="bi bi-bank2"></i> Bank & Account Details (Salaried Account)</div>
+          <div class="ss-section-body">
+            <div class="ss-form-grid">
+              <div class="ss-field">
+                <label class="ss-label">Statement Style <span class="ss-required">*</span></label>
+                <select class="form-select form-select-sm" id="bss-style">
+                  <option value="icici" selected>ICICI Detailed Statement (PDF Replica)</option>
+                  <option value="standard">Standard Modern Statement</option>
+                </select>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Bank Name <span class="ss-required">*</span></label>
+                <div class="d-flex gap-1 align-items-center">
+                  <input type="text" class="form-control form-control-sm text-uppercase flex-grow-1" id="bss-bank" list="bss-bank-list" placeholder="Bank Name (or select from list)" oninput="App.previewBankLogo(this.value, 'bss-logo-preview')" value="ICICI BANK" />
+                  <datalist id="bss-bank-list"></datalist>
+                  <div class="slip-comp-logo-preview ms-1" id="bss-logo-preview" style="width:32px;height:32px;min-width:32px;border-radius:4px;" title="Bank Logo"><span>B</span></div>
+                  <label class="btn btn-outline-primary btn-sm mb-0 px-2" title="Upload Custom Bank Logo"><i class="bi bi-image"></i><input type="file" accept="image/*" hidden id="bss-logo-upload" onchange="App.uploadStatementBankLogo(this, 'salary')" /></label>
+                </div>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Account Type</label>
+                <select class="form-select form-select-sm" id="bss-actype">
+                  <option value="SALARY" selected>SALARY - Salary Account</option>
+                  <option value="SB - SALARY">SB - Salary Account</option>
+                  <option value="SAL">SAL - Salaried Savings</option>
+                  <option value="SB">SB - Savings Account</option>
+                  <option value="CAA">CAA - Current Account</option>
+                  <option value="OD">OD - Overdraft Account</option>
+                </select>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Account Holder Name <span class="ss-required">*</span></label>
+                <input type="text" class="form-control form-control-sm text-uppercase" id="bss-holder" placeholder="Employee Full Name" value="MUKUL RAHAMAN" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Account Number <span class="ss-required">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="bss-acno" placeholder="Account Number" value="091405003332" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Customer ID (Cust ID)</label>
+                <input type="text" class="form-control form-control-sm" id="bss-custid" placeholder="e.g. 573886835" value="573886835" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">IFSC Code</label>
+                <div class="input-group input-group-sm">
+                  <input type="text" class="form-control form-control-sm text-uppercase font-monospace" id="bss-ifsc" placeholder="IFSC" maxlength="11" value="ICIC0000914" oninput="App.onSalaryStatementIFSCInput(this.value)" onchange="App.onSalaryStatementIFSCInput(this.value)" />
+                  <button class="btn btn-outline-primary btn-sm px-2" type="button" onclick="App.lookupSalaryStatementIFSC()" title="Auto-fetch Bank, Branch, Address &amp; Logo by IFSC"><i class="bi bi-search"></i></button>
+                </div>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Branch Name / Code</label>
+                <div class="input-group input-group-sm">
+                  <input type="text" class="form-control form-control-sm text-uppercase" id="bss-branch" placeholder="Branch Name" value="BASIRHAT" />
+                  <input type="text" class="form-control form-control-sm text-uppercase" id="bss-branchcode" placeholder="Code" style="max-width:85px" value="0914" />
+                </div>
+              </div>
+              <div class="ss-field" style="grid-column: 1 / -1;">
+                <label class="ss-label">Customer Address</label>
+                <input type="text" class="form-control form-control-sm text-uppercase" id="bss-holderaddress" placeholder="Holder Address" value="CHOWRASHI, DEGANGA, CHAURASHI, NORTH 24 PARGANAS, 743424, WEST BENGAL, INDIA" />
+              </div>
+              <div class="ss-field" style="grid-column: 1 / -1;">
+                <label class="ss-label">Branch Address</label>
+                <input type="text" class="form-control form-control-sm text-uppercase" id="bss-branchaddress" placeholder="Branch Address" value="ICICI BANK LTD., BASIRHAT BRANCH, BHAWANIPUR, PO.-BASIRHAT COLLEGE, DIST.- 24 PARGANAS (NORTH).743 412, NORTH 24 PARGANAS, WEST BENGAL, INDIA" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Salary Parameters & Balance Safeguards -->
+        <div class="ss-section">
+          <div class="ss-section-header"><i class="bi bi-cash-stack"></i> Salary Parameters, Period & Average Balance</div>
+          <div class="ss-section-body">
+            <div class="ss-form-grid ss-form-grid-4">
+              <div class="ss-field">
+                <label class="ss-label">Employer / Company Name <span class="ss-required">*</span></label>
+                <input type="text" class="form-control form-control-sm text-uppercase" id="bss-company" list="bss-company-list" placeholder="Company Name" value="TECH MAHINDRA LTD" oninput="App.autoGenSalaryStatementTxs()" />
+                <datalist id="bss-company-list"></datalist>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Monthly Net Salary (₹) <span class="ss-required">*</span></label>
+                <input type="number" class="form-control form-control-sm" id="bss-salary-amount" value="65000" min="1" placeholder="e.g. 65000" oninput="App.autoGenSalaryStatementTxs()" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Salary Credit Day</label>
+                <input type="number" class="form-control form-control-sm" id="bss-salary-day" value="5" min="1" max="31" readonly title="Salary is credited on the 5th day of every month as configured" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Monthly Average Balance (₹) <span class="badge bg-success-subtle text-success ms-1">1.5 Lakh</span></label>
+                <input type="number" class="form-control form-control-sm" id="bss-avg-balance" value="150000" min="1000" oninput="App.autoGenSalaryStatementTxs()" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">From Date <span class="ss-required">*</span></label>
+                <input type="date" class="form-control form-control-sm" id="bss-from" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">To Date <span class="ss-required">*</span></label>
+                <input type="date" class="form-control form-control-sm" id="bss-to" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Monthly Txn Density</label>
+                <select class="form-select form-select-sm" id="bss-density" onchange="App.autoGenSalaryStatementTxs()">
+                  <option value="25" selected>22–28 Txns / Month (Standard Salaried)</option>
+                  <option value="35">30–38 Txns / Month (Active Spender)</option>
+                  <option value="16">15–20 Txns / Month (Light)</option>
+                </select>
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Opening Balance (₹)</label>
+                <input type="number" class="form-control form-control-sm" id="bss-opening" value="150000" min="0" oninput="App.recalcSalaryStatement()" />
+              </div>
+              <div class="ss-field">
+                <label class="ss-label">Minimum Daily Balance (₹)</label>
+                <input type="number" class="form-control form-control-sm" id="bss-min-balance" value="25000" min="0" oninput="App.recalcSalaryStatement()" />
+              </div>
+              <div class="ss-field d-flex align-items-end" style="grid-column: span 3;">
+                <div class="form-text mb-2 text-muted">
+                  <i class="bi bi-shield-lock-fill text-success me-1"></i>
+                  <strong>Auto Salary Rule:</strong> Credited on the <strong>5th</strong> of every month with authentic narration format:
+                  <code class="text-primary" style="font-size:11px;">TRANSFER FROM [12-DIGIT UTR] NEFT*UTIB0001550*AXISP00629663 007*[COMPANY]</code> (UTR changes every month).
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transactions (Salaried Person) -->
+        <div class="ss-section">
+          <div class="ss-section-header d-flex justify-content-between align-items-center">
+            <div><i class="bi bi-list-columns"></i> Statement Transactions (<span id="stmt-salary-tx-count">0</span> rows)</div>
+          </div>
+          <div class="ss-section-body">
+            <div class="d-flex gap-2 mb-3 align-items-center flex-wrap">
+              <button class="btn btn-primary btn-sm" onclick="App.autoGenSalaryStatementTxs()"><i class="bi bi-magic me-1"></i>Auto-generate Salaried Transactions (5th Salary + Expenses)</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="App.addSalaryStatementTxnRow()"><i class="bi bi-plus-lg me-1"></i>Add Row</button>
+              <button class="btn btn-outline-danger btn-sm" onclick="App.clearSalaryStatementTxns()"><i class="bi bi-trash me-1"></i>Clear All</button>
+            </div>
+            <div class="stmt-tx-head">
+              <span>Tran ID</span>
+              <span>Date</span>
+              <span>Remarks / Narration (PDF Format)</span>
+              <span>Withdrawal (Dr)</span>
+              <span>Deposit (Cr)</span>
+              <span>Balance</span>
+              <span></span>
+            </div>
+            <div id="stmt-salary-tx-list" style="max-height: 480px; overflow-y: auto;"></div>
+            <div class="stmt-summary">
+              <div class="stmt-summary-item"><span>Opening</span><strong id="stmt-salary-open-total">₹ 0.00</strong></div>
+              <div class="stmt-summary-item"><span>Total Withdrawals</span><strong id="stmt-salary-dr-total">₹ 0.00</strong></div>
+              <div class="stmt-summary-item"><span>Total Deposits</span><strong id="stmt-salary-cr-total">₹ 0.00</strong></div>
+              <div class="stmt-summary-item stmt-summary-close"><span>Closing</span><strong id="stmt-salary-close-total">₹ 0.00</strong></div>
+            </div>
+            <div class="stmt-min-note" id="stmt-salary-avg-note"></div>
+          </div>
+        </div>
+
+        <!-- Saved Statements (Salaried Person) -->
+        <div class="ss-section">
+          <div class="ss-section-header d-flex justify-content-between align-items-center">
+            <div><i class="bi bi-folder2-open"></i> Saved Salaried Statements</div>
+            <button class="btn btn-outline-primary btn-sm" onclick="App.downloadAllStatements()" title="Export All Statements (JSON)">
+              <i class="bi bi-download me-1"></i>Export All Statements
+            </button>
+          </div>
+          <div class="ss-section-body">
+            <div id="stmt-salary-saved-list"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+</div><!-- /.main-wrapper -->
+
+<!-- ══════════════════════════════════════════════════════════
+     REPORT MODAL
+     ══════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalTitle" aria-modal="true" role="dialog">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalTitle">
+          <i class="bi bi-file-earmark-text-fill me-2" aria-hidden="true"></i>Income Tax Computation
+        </h5>
+        <div class="modal-header-actions">
+          <button class="btn btn-sm btn-outline-secondary" onclick="App.selectReport('classic'); App.generateReport()" aria-label="Switch to Classic format">
+            <i class="bi bi-file-text me-1" aria-hidden="true"></i>Classic
+          </button>
+          <button class="btn btn-sm btn-outline-primary" onclick="App.selectReport('modern'); App.generateReport()" aria-label="Switch to Modern format">
+            <i class="bi bi-file-richtext me-1" aria-hidden="true"></i>Modern
+          </button>
+          <button class="btn btn-sm btn-success" onclick="App.triggerPrint()">
+            <i class="bi bi-printer-fill me-1" aria-hidden="true"></i>Print / PDF
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close modal"></button>
+        </div>
+      </div>
+      <div class="modal-body p-0" id="reportBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCRIPTS
+     ══════════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="js/bank-logos.js"></script>
+<script src="js/tax-engine.js"></script>
+<script src="js/tds-engine.js"></script>
+<script src="js/interest-engine.js"></script>
+<script src="js/report-classic.js"></script>
+<script src="js/report-modern.js"></script>
+<script src="js/salary-slip-engine.js"></script>
+<script src="js/bank-statement-engine.js"></script>
+<script src="js/db.js"></script>
+<script src="js/app.js"></script>
+
+<!-- Mobile overlay dismiss -->
+<script>
+  document.getElementById('sidebarOverlay').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+  });
+</script>
+
+</body>
+</html>

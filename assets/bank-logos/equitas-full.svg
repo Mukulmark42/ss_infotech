@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 75" width="380" height="75">
+  <rect width="100%" height="100%" fill="transparent"/>
+  <g transform="translate(10.0, 10.0) scale(2.2500)">
+    <path d="M24 20.8296H0V3.17041H24V20.8296Z" fill="#243B77"/>
+<path d="M8.55997 8.62342H5.42126V5.51642H8.55997V8.62342Z" fill="#FEFEFE"/>
+<path d="M11.4134 12.745H2.56799V9.638H11.4134V12.745Z" fill="#FEFEFE"/>
+<path d="M5.42126 18.4834V9.638H8.55997V18.4834H5.42126Z" fill="#FEFEFE"/>
+<path d="M18.5469 8.62342H15.4399V5.51642H18.5469V8.62342Z" fill="#FEFEFE"/>
+<path d="M21.432 12.745H12.5865V9.638H21.432V12.745Z" fill="#FEFEFE"/>
+<path d="M15.4399 18.4834V9.638H18.5469V18.4834H15.4399Z" fill="#FEFEFE"/>
+  </g>
+    <text x="76" y="39" font-family="'DM Sans', 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-style="normal" font-size="20" fill="#003366" letter-spacing="1">Equitas Small Finance Bank</text>
+    <text x="78" y="56" font-family="'DM Sans', 'Segoe UI', Arial, sans-serif" font-weight="600" font-size="10.5" fill="#f37021" letter-spacing="0.6">It's Fun Banking</text>
+</svg>

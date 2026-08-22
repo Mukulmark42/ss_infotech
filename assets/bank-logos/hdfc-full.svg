@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 75" width="380" height="75">
+  <rect width="100%" height="100%" fill="transparent"/>
+  <g transform="translate(10.0, 10.0) scale(2.2500)">
+    <g clip-path="url(#clip0_45_4204)">
+<path d="M0 0H24V24H0V0Z" fill="#ED232A"/>
+<path d="M4.20056 4.20067H19.8023V19.8024H4.20056V4.20067Z" fill="white"/>
+<path d="M10.8003 0H13.1993V24H10.8003V0Z" fill="white"/>
+<path d="M0 10.8034H24V13.2024H0V10.8034Z" fill="white"/>
+<path d="M8.40112 8.40133H15.6014V15.6017H8.40112V8.40133Z" fill="#004C8F"/>
+</g>
+<defs>
+<clipPath id="clip0_45_4204">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+  </g>
+    <text x="76" y="39" font-family="'DM Sans', 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-style="normal" font-size="28" fill="#004c8f" letter-spacing="1">HDFC BANK</text>
+    <text x="78" y="56" font-family="'DM Sans', 'Segoe UI', Arial, sans-serif" font-weight="600" font-size="10.5" fill="#ed232a" letter-spacing="0.6">We understand your world</text>
+</svg>
