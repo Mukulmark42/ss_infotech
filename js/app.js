@@ -1789,18 +1789,42 @@ const App = (() => {
 
   function previewBankLogo(name, previewId) {
     const el = document.getElementById(previewId);
-    if (!el || !name) return;
+    if (!el) return;
+    if (!name) {
+      el.innerHTML = `<span>B</span>`;
+      el.style.background = '';
+      el.style.color = '';
+      el.style.border = '';
+      if (previewId === 'bs-logo-preview') _statementBankLogoData = null;
+      if (previewId === 'bss-logo-preview') _salaryStatementBankLogoData = null;
+      return;
+    }
     const initial = name.trim().toUpperCase().slice(0, 2) || 'B';
-    const localLogo = _resolveBankLogo(name, null);
+    const bankConfigs = _getBankConfigObjects();
+    const cleanName = name.trim().toUpperCase();
+    const matchedBank = bankConfigs.find(b => b.name.toUpperCase() === cleanName || b.name.toUpperCase().includes(cleanName) || cleanName.includes(b.name.toUpperCase()));
+    const savedLogo = matchedBank ? matchedBank.logoData : null;
+    const localLogo = _resolveBankLogo(name, savedLogo);
     if (localLogo) {
+      if (previewId === 'bs-logo-preview') {
+        _statementBankLogoData = localLogo;
+      } else if (previewId === 'bss-logo-preview') {
+        _salaryStatementBankLogoData = localLogo;
+      }
       el.style.background = '#fff';
       el.style.border = '1px solid #e2e8f0';
       el.innerHTML = `<img src="${localLogo}" alt="${initial}" style="width:100%;height:100%;object-fit:contain;" />`;
       return;
     }
+    if (previewId === 'bs-logo-preview') {
+      _statementBankLogoData = null;
+    } else if (previewId === 'bss-logo-preview') {
+      _salaryStatementBankLogoData = null;
+    }
     el.style.background = '#1a3c6e';
     el.style.color = '#fff';
-    el.innerHTML = `<span style="font-weight:800;font-size:14px;">${initial}</span>`;
+    el.style.border = '1px solid #e2e8f0';
+    el.innerHTML = `<span style="font-weight:800;font-size:14px;color:#fff;">${initial}</span>`;
   }
 
   // ── IFSC & Bank Auto-Lookup Engine (Razorpay IFSC API + Brandfetch) ──
@@ -1984,39 +2008,21 @@ const App = (() => {
       const banks = _getBankConfigObjects();
       const matched = banks.find(b => b.ifsc && b.ifsc.toUpperCase() === clean);
       if (matched) {
-        const sel = document.getElementById('bs-bank');
-        if (sel) {
-          if (sel.tagName === 'SELECT') {
-            let opt = Array.from(sel.options).find(o => o.value.toUpperCase() === matched.name.toUpperCase());
-            if (!opt) {
-              opt = document.createElement('option');
-              opt.value = matched.name.toUpperCase();
-              opt.textContent = matched.name.toUpperCase();
-              sel.appendChild(opt);
-            }
-            sel.value = opt.value;
-          } else {
-            sel.value = matched.name.toUpperCase();
-          }
-        }
+        // Only populate branch & address - make NO effect on bank name or bank logo
         const branchEl = document.getElementById('bs-branch');
-        if (branchEl) branchEl.value = (matched.branch || matched.name).toUpperCase();
+        if (branchEl && matched.branch) branchEl.value = (matched.branch || matched.name).toUpperCase();
         const codeEl = document.getElementById('bs-branchcode');
         if (codeEl) codeEl.value = clean.slice(-4);
         const addrEl = document.getElementById('bs-branchaddress');
         if (addrEl && matched.address) addrEl.value = matched.address.toUpperCase();
-        _updateStatementBankLogoPreview(matched);
         return;
       }
 
-      // Auto-fetch from Razorpay IFSC API & Brandfetch
+      // Auto-fetch branch & address from Razorpay IFSC API (make NO effect on bank name or logo)
       fetchBankDetailsByIFSC(clean, {
-        bankNameElId: 'bs-bank',
         branchElId: 'bs-branch',
         codeElId: 'bs-branchcode',
-        addressElId: 'bs-branchaddress',
-        previewId: 'bs-logo-preview',
-        overwriteName: true
+        addressElId: 'bs-branchaddress'
       });
     }
   }
@@ -2027,14 +2033,28 @@ const App = (() => {
       alert('Please enter an 11-character IFSC code first.');
       return;
     }
-    fetchBankDetailsByIFSC(ifsc, {
-      bankNameElId: 'bs-bank',
+    const clean = ifsc.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (clean.length !== 11) {
+      alert('Please enter a valid 11-character IFSC code.');
+      return;
+    }
+    const banks = _getBankConfigObjects();
+    const matched = banks.find(b => b.ifsc && b.ifsc.toUpperCase() === clean);
+    if (matched) {
+      const branchEl = document.getElementById('bs-branch');
+      if (branchEl && matched.branch) branchEl.value = (matched.branch || matched.name).toUpperCase();
+      const codeEl = document.getElementById('bs-branchcode');
+      if (codeEl) codeEl.value = clean.slice(-4);
+      const addrEl = document.getElementById('bs-branchaddress');
+      if (addrEl && matched.address) addrEl.value = matched.address.toUpperCase();
+      return;
+    }
+
+    fetchBankDetailsByIFSC(clean, {
       branchElId: 'bs-branch',
       codeElId: 'bs-branchcode',
       addressElId: 'bs-branchaddress',
-      previewId: 'bs-logo-preview',
-      manualAlert: true,
-      overwriteName: true
+      manualAlert: true
     });
   }
 
@@ -3549,31 +3569,29 @@ const App = (() => {
     if (!preview) return;
     if (_statementBankLogoData) {
       preview.innerHTML = `<img src="${_statementBankLogoData}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" />`;
-      preview.style.background = 'transparent';
-      return;
-    }
-    if (bank && bank.logoData) {
-      preview.innerHTML = `<img src="${bank.logoData}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" />`;
-      preview.style.background = 'transparent';
-    } else if (bank && bank.name) {
-      const localLogo = (typeof BankLogos !== 'undefined') ? BankLogos.getLogo(bank.name) : null;
-      if (localLogo) {
-        preview.style.background = '#fff';
-        preview.style.border = '1px solid #e2e8f0';
-        preview.innerHTML = `<img src="${localLogo}" alt="${_esc(bank.name)}" style="width:100%;height:100%;object-fit:contain;" />`;
-        return;
-      }
-      const initial = (bank.name || 'B').trim().toUpperCase().slice(0, 2) || 'B';
-      const domain = (typeof BankStatementEngine !== 'undefined' && BankStatementEngine.getBankDomain)
-        ? BankStatementEngine.getBankDomain(bank.name)
-        : 'bank.com';
-      const bfUrl = `https://cdn.brandfetch.io/${domain}/w/100/h/100`;
       preview.style.background = '#fff';
       preview.style.border = '1px solid #e2e8f0';
-      preview.innerHTML = `<img src="${bfUrl}" alt="${initial}" style="width:100%;height:100%;object-fit:contain;" onerror="this.onerror=null;this.parentElement.style.background='#3b82f6';this.parentElement.innerHTML='<span>${initial}</span>';" />`;
+      return;
+    }
+    const resolvedLogo = bank ? _resolveBankLogo(bank.name, bank.logoData) : null;
+    if (resolvedLogo) {
+      _statementBankLogoData = resolvedLogo;
+      preview.innerHTML = `<img src="${resolvedLogo}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" />`;
+      preview.style.background = '#fff';
+      preview.style.border = '1px solid #e2e8f0';
+    } else if (bank && bank.name) {
+      _statementBankLogoData = null;
+      const initial = (bank.name || 'B').trim().toUpperCase().slice(0, 2) || 'B';
+      preview.style.background = '#1a3c6e';
+      preview.style.color = '#fff';
+      preview.style.border = '1px solid #e2e8f0';
+      preview.innerHTML = `<span style="font-weight:800;font-size:14px;color:#fff;">${initial}</span>`;
     } else {
+      _statementBankLogoData = null;
       preview.innerHTML = `<span>B</span>`;
       preview.style.background = '';
+      preview.style.color = '';
+      preview.style.border = '';
     }
   }
 
@@ -3582,31 +3600,29 @@ const App = (() => {
     if (!preview) return;
     if (_salaryStatementBankLogoData) {
       preview.innerHTML = `<img src="${_salaryStatementBankLogoData}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" />`;
-      preview.style.background = 'transparent';
-      return;
-    }
-    if (bank && bank.logoData) {
-      preview.innerHTML = `<img src="${bank.logoData}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" />`;
-      preview.style.background = 'transparent';
-    } else if (bank && bank.name) {
-      const localLogo = (typeof BankLogos !== 'undefined') ? BankLogos.getLogo(bank.name) : null;
-      if (localLogo) {
-        preview.style.background = '#fff';
-        preview.style.border = '1px solid #e2e8f0';
-        preview.innerHTML = `<img src="${localLogo}" alt="${_esc(bank.name)}" style="width:100%;height:100%;object-fit:contain;" />`;
-        return;
-      }
-      const initial = (bank.name || 'B').trim().toUpperCase().slice(0, 2) || 'B';
-      const domain = (typeof BankStatementEngine !== 'undefined' && BankStatementEngine.getBankDomain)
-        ? BankStatementEngine.getBankDomain(bank.name)
-        : 'bank.com';
-      const bfUrl = `https://cdn.brandfetch.io/${domain}/w/100/h/100`;
       preview.style.background = '#fff';
       preview.style.border = '1px solid #e2e8f0';
-      preview.innerHTML = `<img src="${bfUrl}" alt="${initial}" style="width:100%;height:100%;object-fit:contain;" onerror="this.onerror=null;this.parentElement.style.background='#3b82f6';this.parentElement.innerHTML='<span>${initial}</span>';" />`;
+      return;
+    }
+    const resolvedLogo = bank ? _resolveBankLogo(bank.name, bank.logoData) : null;
+    if (resolvedLogo) {
+      _salaryStatementBankLogoData = resolvedLogo;
+      preview.innerHTML = `<img src="${resolvedLogo}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" />`;
+      preview.style.background = '#fff';
+      preview.style.border = '1px solid #e2e8f0';
+    } else if (bank && bank.name) {
+      _salaryStatementBankLogoData = null;
+      const initial = (bank.name || 'B').trim().toUpperCase().slice(0, 2) || 'B';
+      preview.style.background = '#1a3c6e';
+      preview.style.color = '#fff';
+      preview.style.border = '1px solid #e2e8f0';
+      preview.innerHTML = `<span style="font-weight:800;font-size:14px;color:#fff;">${initial}</span>`;
     } else {
+      _salaryStatementBankLogoData = null;
       preview.innerHTML = `<span>B</span>`;
       preview.style.background = '';
+      preview.style.color = '';
+      preview.style.border = '';
     }
   }
 
@@ -3648,7 +3664,7 @@ const App = (() => {
       const handleBankSelect = () => {
         const banks = _getBankConfigObjects();
         const bVal = (bankSel.value || '').trim().toUpperCase();
-        const bank = banks.find(b => b.name.toUpperCase() === bVal || (bVal && b.name.toUpperCase().includes(bVal)));
+        const bank = banks.find(b => b.name.toUpperCase() === bVal || (bVal && b.name.toUpperCase().includes(bVal)) || (bVal && bVal.includes(b.name.toUpperCase())));
         _statementBankLogoData = null;
         const uploadEl = document.getElementById('bs-logo-upload'); if (uploadEl) uploadEl.value = '';
         if (bank) {
@@ -3669,6 +3685,8 @@ const App = (() => {
           }
         } else if (bVal) {
           previewBankLogo(bVal, 'bs-logo-preview');
+        } else {
+          _updateStatementBankLogoPreview(null);
         }
 
         if (bVal.includes('ICICI')) {
@@ -3889,9 +3907,13 @@ const App = (() => {
   }
 
   function _collectStatementData() {
-    const bankName = document.getElementById('bs-bank')?.value || '';
+    const bankName = (document.getElementById('bs-bank')?.value || '').trim();
     const banks = _getBankConfigObjects();
-    const bank = banks.find(b => b.name === bankName) || { name: bankName };
+    const bank = banks.find(b => b.name.toUpperCase() === bankName.toUpperCase()) ||
+                 banks.find(b => bankName && (b.name.toUpperCase().includes(bankName.toUpperCase()) || bankName.toUpperCase().includes(b.name.toUpperCase()))) ||
+                 { name: bankName };
+    const savedLogo = bank.logoData || _resolveBankLogo(bank.name || bankName, null);
+    const effectiveLogo = _statementBankLogoData || savedLogo || null;
     const rows = document.querySelectorAll('#stmt-tx-list .stmt-tx-row');
     const transactions = [];
     rows.forEach(row => {
@@ -3909,9 +3931,9 @@ const App = (() => {
       persona: 'business',
       style: document.getElementById('bs-style')?.value || 'icici',
       bank: {
-        name: bank.name,
-        logoData: _statementBankLogoData || bank.logoData || null,
-        logoText: bank.logoText || '',
+        name: bank.name || bankName,
+        logoData: effectiveLogo,
+        logoText: bank.logoText || (bankName ? bankName.slice(0, 2) : ''),
         address: document.getElementById('bs-branchaddress')?.value.trim() || bank.address || ''
       },
       account: {
@@ -4154,7 +4176,7 @@ const App = (() => {
       const handleBankSelect = () => {
         const banks = _getBankConfigObjects();
         const bVal = (bankSel.value || '').trim().toUpperCase();
-        const bank = banks.find(b => b.name.toUpperCase() === bVal || (bVal && b.name.toUpperCase().includes(bVal)));
+        const bank = banks.find(b => b.name.toUpperCase() === bVal || (bVal && b.name.toUpperCase().includes(bVal)) || (bVal && bVal.includes(b.name.toUpperCase())));
         _salaryStatementBankLogoData = null;
         const uploadEl = document.getElementById('bss-logo-upload'); if (uploadEl) uploadEl.value = '';
         if (bank) {
@@ -4175,6 +4197,8 @@ const App = (() => {
           }
         } else if (bVal) {
           previewBankLogo(bVal, 'bss-logo-preview');
+        } else {
+          _updateSalaryStatementBankLogoPreview(null);
         }
 
         if (bVal.includes('ICICI')) {
@@ -4301,28 +4325,26 @@ const App = (() => {
       alert('Please enter a valid 11-character IFSC code.');
       return;
     }
-    const details = await fetchBankDetailsByIFSC(ifsc);
-    if (!details) {
-      alert(`Could not fetch details for IFSC "${ifsc}". Please verify the code.`);
+    const clean = ifsc.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const banks = _getBankConfigObjects();
+    const matched = banks.find(b => b.ifsc && b.ifsc.toUpperCase() === clean);
+    if (matched) {
+      // Only populate branch & address - make NO effect on bank name or logo
+      const branchInput = document.getElementById('bss-branch');
+      if (branchInput && matched.branch) branchInput.value = (matched.branch || matched.name).toUpperCase();
+      const branchCodeInput = document.getElementById('bss-branchcode');
+      if (branchCodeInput) branchCodeInput.value = clean.slice(-4);
+      const branchAddrInput = document.getElementById('bss-branchaddress');
+      if (branchAddrInput && matched.address) branchAddrInput.value = matched.address.toUpperCase();
       return;
     }
 
-    const bankInput = document.getElementById('bss-bank');
-    if (bankInput && details.bank) {
-      bankInput.value = details.bank;
-      previewBankLogo(details.bank, 'bss-logo-preview');
-    }
-    const branchInput = document.getElementById('bss-branch');
-    if (branchInput && details.branch) branchInput.value = details.branch;
-    const branchCodeInput = document.getElementById('bss-branchcode');
-    if (branchCodeInput) branchCodeInput.value = ifsc.slice(-4);
-    const branchAddrInput = document.getElementById('bss-branchaddress');
-    if (branchAddrInput && details.address) branchAddrInput.value = details.address;
-
-    if (details.bank && details.bank.includes('ICICI')) {
-      const styleEl = document.getElementById('bss-style');
-      if (styleEl) styleEl.value = 'icici';
-    }
+    await fetchBankDetailsByIFSC(clean, {
+      branchElId: 'bss-branch',
+      codeElId: 'bss-branchcode',
+      addressElId: 'bss-branchaddress',
+      manualAlert: true
+    });
   }
 
   function _salaryStatementDates() {
@@ -4462,9 +4484,13 @@ const App = (() => {
   }
 
   function _collectSalaryStatementData() {
-    const bankName = document.getElementById('bss-bank')?.value || '';
+    const bankName = (document.getElementById('bss-bank')?.value || '').trim();
     const banks = _getBankConfigObjects();
-    const bank = banks.find(b => b.name === bankName) || { name: bankName };
+    const bank = banks.find(b => b.name.toUpperCase() === bankName.toUpperCase()) ||
+                 banks.find(b => bankName && (b.name.toUpperCase().includes(bankName.toUpperCase()) || bankName.toUpperCase().includes(b.name.toUpperCase()))) ||
+                 { name: bankName };
+    const savedLogo = bank.logoData || _resolveBankLogo(bank.name || bankName, null);
+    const effectiveLogo = _salaryStatementBankLogoData || savedLogo || null;
     const rows = document.querySelectorAll('#stmt-salary-tx-list .stmt-tx-row');
     const transactions = [];
     rows.forEach(row => {
@@ -4484,9 +4510,9 @@ const App = (() => {
       companyName: document.getElementById('bss-company')?.value || 'TECH MAHINDRA LTD',
       salaryAmount: parseFloat(document.getElementById('bss-salary-amount')?.value) || 65000,
       bank: {
-        name: bank.name,
-        logoData: _salaryStatementBankLogoData || bank.logoData || null,
-        logoText: bank.logoText || '',
+        name: bank.name || bankName,
+        logoData: effectiveLogo,
+        logoText: bank.logoText || (bankName ? bankName.slice(0, 2) : ''),
         address: document.getElementById('bss-branchaddress')?.value.trim() || bank.address || ''
       },
       account: {

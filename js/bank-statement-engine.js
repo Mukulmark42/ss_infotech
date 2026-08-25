@@ -728,15 +728,14 @@ const BankStatementEngine = (() => {
     const closingBalance = balance;
     const openingBalance = parseFloat(ac.openingBalance) || 0;
 
-    // Bank Logo rendering - prioritize local project bank logo
+    // Bank Logo rendering - prioritize local project bank logo / admin saved logo
     const logoData = b.logoData || (typeof BankLogos !== 'undefined' ? BankLogos.getLogo(bankName) : null);
     let logoHtml;
     if (logoData) {
       logoHtml = `<div class="icici-logo-img-wrap"><img src="${logoData}" alt="${_esc(bankName)}" class="icici-logo-img" /></div>`;
     } else {
-      const bfUrl = getBrandfetchLogo(bankName, 400, 120);
-      const domain = getBankDomain(bankName);
-      logoHtml = `<div class="icici-logo-img-wrap"><img src="${bfUrl}" alt="${_esc(bankName)}" class="icici-logo-img" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain=${domain}&sz=128';this.style.height='36px';this.style.width='36px';" /></div>`;
+      const initial = (bankName || 'B').trim().toUpperCase().slice(0, 2) || 'B';
+      logoHtml = `<div class="icici-logo-img-wrap" style="background:#1a3c6e;color:#fff;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;font-weight:800;font-size:16px;padding:6px 12px;letter-spacing:1px;">${initial}</div>`;
     }
 
     // Build Transaction Rows HTML
@@ -1147,14 +1146,12 @@ const BankStatementEngine = (() => {
     const closingBalance = balance;
     const openingBalance = parseFloat(ac.openingBalance) || 0;
 
-    // Bank Logo badge - prioritize local project bank logo
+    // Bank Logo badge - prioritize local project bank logo / admin saved logo
     const effectiveLogo = logoData || (typeof BankLogos !== 'undefined' ? BankLogos.getLogo(bankName) : null);
     let logoHtml;
     if (effectiveLogo) {
       logoHtml = `<div class="mod-logo mod-logo-img-wrap" style="background:#fff;padding:2px;"><img src="${effectiveLogo}" alt="${_esc(bankName)}" class="mod-logo-img" style="width:100%;height:100%;object-fit:contain;" /></div>`;
     } else {
-      const bfUrl = getBrandfetchLogo(bankName, 200, 200);
-      const domain = getBankDomain(bankName);
       const colors = [
         ['#0f172a','#1e293b'],['#0369a1','#0284c7'],['#1e3a8a','#2563eb'],
         ['#701a75','#86198f'],['#14532d','#15803d'],['#7c2d12','#9a3412'],
@@ -1162,7 +1159,7 @@ const BankStatementEngine = (() => {
       ];
       const ci = bankName.charCodeAt(0) % colors.length;
       const grad = `linear-gradient(135deg, ${colors[ci][0]}, ${colors[ci][1]})`;
-      logoHtml = `<div class="mod-logo" style="background:#fff;border:1px solid #e2e8f0;padding:4px;overflow:hidden;"><img src="${bfUrl}" alt="${_esc(bankName)}" style="width:100%;height:100%;object-fit:contain;" onerror="this.onerror=null;this.parentElement.style.background='${grad}';this.parentElement.style.color='#fff';this.parentElement.innerHTML='${_esc(logoText)}';" /></div>`;
+      logoHtml = `<div class="mod-logo" style="background:${grad};color:#fff;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">${_esc(logoText || bankName.slice(0,2))}</div>`;
     }
 
     const txRows = rows.map((r, i) => {
