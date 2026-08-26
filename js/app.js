@@ -536,15 +536,29 @@ const App = (() => {
   function _renderReportHTML(data) {
     const d = data || activePrintData || _buildComputationData();
     activePrintData = d;
-    const html = selectedReport === 'modern'
-      ? ReportModern.generate(d)
-      : ReportClassic.generate(d);
+    let html = '';
+    if (selectedReport === 'ack') {
+      html = ReportAck.generate(d);
+    } else if (selectedReport === 'modern') {
+      html = ReportModern.generate(d);
+    } else {
+      html = ReportClassic.generate(d);
+    }
 
     const body = document.getElementById('reportBody');
     if (body) body.innerHTML = html;
 
     const printArea = document.getElementById('print-area');
     if (printArea) printArea.innerHTML = html;
+
+    const titleEl = document.getElementById('reportModalTitle');
+    if (titleEl) {
+      if (selectedReport === 'ack') {
+        titleEl.innerHTML = '<i class="bi bi-file-earmark-check-fill me-2 text-primary" aria-hidden="true"></i>Income Tax Return Acknowledgement (ITR-V)';
+      } else {
+        titleEl.innerHTML = '<i class="bi bi-file-earmark-text-fill me-2" aria-hidden="true"></i>Income Tax Computation';
+      }
+    }
 
     return html;
   }
@@ -561,12 +575,13 @@ const App = (() => {
     }
     if (modal) modal.style.display = 'none';
 
-    // Set filename: NAME_AY_Computation
+    // Set filename: NAME_AY_Computation or NAME_AY_ITR_Acknowledgement
     const d = activePrintData || {};
     const clientName = ((d.client && d.client.name) || 'CLIENT').toUpperCase().replace(/[^A-Z0-9]/g, '_');
     const ay = (d.client && d.client.ay) || 'AY';
+    const suffix = selectedReport === 'ack' ? 'ITR_Acknowledgement' : 'Computation';
     const prevTitle = document.title;
-    document.title = `${clientName}_${ay}_Computation`;
+    document.title = `${clientName}_${ay}_${suffix}`;
 
     setTimeout(() => {
       window.print();
@@ -585,9 +600,30 @@ const App = (() => {
     selectedReport = type;
     const btnC = document.getElementById('rt-classic');
     const btnM = document.getElementById('rt-modern');
+    const btnA = document.getElementById('rt-ack');
     if (btnC) btnC.classList.toggle('active', type === 'classic');
     if (btnM) btnM.classList.toggle('active', type === 'modern');
+    if (btnA) btnA.classList.toggle('active', type === 'ack');
+
+    const mBtnC = document.getElementById('modal-rt-classic');
+    const mBtnM = document.getElementById('modal-rt-modern');
+    const mBtnA = document.getElementById('modal-rt-ack');
+    if (mBtnC) { mBtnC.classList.toggle('btn-primary', type === 'classic'); mBtnC.classList.toggle('btn-outline-secondary', type !== 'classic'); }
+    if (mBtnM) { mBtnM.classList.toggle('btn-primary', type === 'modern'); mBtnM.classList.toggle('btn-outline-primary', type !== 'modern'); }
+    if (mBtnA) { mBtnA.classList.toggle('btn-primary', type === 'ack'); mBtnA.classList.toggle('btn-outline-info', type !== 'ack'); }
+
     _renderReportHTML(activePrintData);
+  }
+
+  function generateAck() {
+    selectedReport = 'ack';
+    const btnC = document.getElementById('rt-classic');
+    const btnM = document.getElementById('rt-modern');
+    const btnA = document.getElementById('rt-ack');
+    if (btnC) btnC.classList.toggle('active', false);
+    if (btnM) btnM.classList.toggle('active', false);
+    if (btnA) btnA.classList.toggle('active', true);
+    generateReport();
   }
 
   // ── Compute all data ────────────────────────────────────────
@@ -645,22 +681,28 @@ const App = (() => {
     // STCG Details (generate realistic entries)
     const stcgDetails = stcg > 0 ? _generateSTCGDetails(stcg) : [];
 
+    const formNo = _v('f-form-no') || (natureOfBiz ? 'ITR-4' : 'ITR-1');
+
     const client = {
-      name:    _v('f-name'),
-      father:  _v('f-father'),
-      pan:     _v('f-pan').toUpperCase(),
-      dob:     _v('f-dob'),
-      gender:  _v('f-gender'),
-      mobile:  _v('f-mobile'),
-      email:   _v('f-email'),
-      address: _v('f-address'),
+      name:        _v('f-name'),
+      father:      _v('f-father'),
+      pan:         _v('f-pan').toUpperCase(),
+      dob:         _v('f-dob'),
+      gender:      _v('f-gender'),
+      mobile:      _v('f-mobile'),
+      email:       _v('f-email'),
+      address:     _v('f-address'),
       ay,
-      ward:    _v('f-ward'),
-      filing:  _v('f-filing'),
-      status:  _v('f-status'),
-      nature:  natureOfBiz,
-      bcode:   _v('f-bcode'),
-      bname:   _v('f-bname'),
+      ward:        _v('f-ward'),
+      filing:      _v('f-filing'),
+      status:      _v('f-status'),
+      nature:      natureOfBiz,
+      bcode:       _v('f-bcode'),
+      bname:       _v('f-bname'),
+      formNumber:  formNo,
+      ackNo:       _v('f-ack-no'),
+      filingDate:  _v('f-filing-date'),
+      evcMode:     _v('f-evc-mode') || 'Aadhaar OTP',
     };
 
     return {
@@ -976,7 +1018,8 @@ const App = (() => {
             </div>
             <div class="cc-footer">
               <button class="cc-action" title="Edit" onclick="App.editClient('${_esc(c.id)}')"><i class="bi bi-pencil-fill"></i></button>
-              <button class="cc-action" title="Print" onclick="App.printClient('${_esc(c.id)}')"><i class="bi bi-printer-fill"></i></button>
+              <button class="cc-action" title="Print Computation" onclick="App.printClient('${_esc(c.id)}')"><i class="bi bi-printer-fill"></i></button>
+              <button class="cc-action" title="Print ITR Acknowledgement" onclick="App.printClientAck('${_esc(c.id)}')"><i class="bi bi-file-earmark-check-fill" style="color:var(--primary)"></i></button>
               <button class="cc-action" title="Download JSON" onclick="App.downloadClientRecord('${_esc(c.id)}')"><i class="bi bi-download"></i></button>
               <button class="cc-action" title="Duplicate" onclick="App.duplicateClient('${_esc(c.id)}')"><i class="bi bi-copy"></i></button>
               <button class="cc-action cc-danger" title="Delete" onclick="App.deleteClient('${_esc(c.id)}')"><i class="bi bi-trash-fill"></i></button>
@@ -1022,6 +1065,10 @@ const App = (() => {
       _setSelect('f-nature',  c.nature);
       _setVal('f-bcode',   c.bcode);
       _setVal('f-bname',   c.bname);
+      _setSelect('f-form-no', c.formNumber || (c.nature ? 'ITR-4' : 'ITR-1'));
+      _setVal('f-ack-no',     c.ackNo || '');
+      _setVal('f-filing-date', c.filingDate || '');
+      _setSelect('f-evc-mode', c.evcMode || 'Aadhaar OTP');
 
       if (c.banks) { banks = c.banks; _renderBanks(); }
       if (c.incomeInputs) {
@@ -1113,6 +1160,17 @@ const App = (() => {
       modalEl.removeEventListener('shown.bs.modal', handler);
       setTimeout(() => triggerPrint(), 200);
     });
+  }
+
+  function printClientAck(id) {
+    selectedReport = 'ack';
+    const btnC = document.getElementById('rt-classic');
+    const btnM = document.getElementById('rt-modern');
+    const btnA = document.getElementById('rt-ack');
+    if (btnC) btnC.classList.toggle('active', false);
+    if (btnM) btnM.classList.toggle('active', false);
+    if (btnA) btnA.classList.toggle('active', true);
+    printClient(id);
   }
 
   function _setVal(id, v)    { const el = document.getElementById(id); if (el) el.value = v || ''; }
@@ -4812,9 +4870,9 @@ const App = (() => {
     addBank, removeBank, setPrimary, syncBanks: _syncBanks,
     onNatureChange, onDeductorChange,
     toggleIncome, recalcIncome,
-    selectReport, generateReport, triggerPrint,
+    selectReport, generateReport, generateAck, triggerPrint,
     saveClient,
-    searchClients, editClient, deleteClient, duplicateClient, printClient,
+    searchClients, editClient, deleteClient, duplicateClient, printClient, printClientAck,
     saveAdminConfig, downloadLocalBackup, restoreLocalBackup, filterAdminSection,
     addCustomAY, removeCustomAY,
     addCustomDeductor, removeCustomDeductor, editCustomDeductor, saveEditDeductor,
