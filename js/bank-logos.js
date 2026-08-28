@@ -74,33 +74,33 @@ const BankLogos = (() => {
     const s = name.trim().toUpperCase()
       .replace(/[^A-Z0-9]/g, '');
 
-    if (s.includes('STATEBANK') || s.includes('SBI') || s.includes('STATEOFINDIA') || s.includes('STATEBANKOFINDIA')) return 'SBI';
+    if (s === 'SBI' || s.includes('STATEBANK') || s.includes('STATEOFINDIA') || s.includes('STATEBANKOFINDIA')) return 'SBI';
+    if (s === 'CUB' || s.includes('CITYUNION')) return 'CUB';
+    if (s === 'CBI' || s.includes('CENTRALBANK') || s.includes('CENTRAL')) return 'CENTRAL';
+    if (s === 'UBI' || s.includes('UNIONBANK') || s.includes('UNION')) return 'UNION';
+    if (s === 'BOI' || s.includes('BANKOFINDIA')) return 'BOI';
+    if (s === 'BOB' || s.includes('BARODA') || s.includes('BANKOFBARODA')) return 'BOB';
+    if (s === 'PNB' || s.includes('PUNJAB') || s.includes('PUNJABNATIONAL')) return 'PNB';
+    if (s === 'IOB' || s.includes('OVERSEAS') || s.includes('INDIANOVERSEAS')) return 'IOB';
+    if (s === 'SIB' || s.includes('SOUTHINDIAN')) return 'SIB';
+    if (s === 'KVB' || s.includes('KARUR') || s.includes('VYSYA')) return 'KVB';
+    if (s === 'IPPB' || s.includes('POSTPAYMENTS') || (s.includes('POST') && s.includes('BANK'))) return 'IPPB';
+    if (s.includes('PAYTM')) return 'PAYTM';
+    if (s.includes('AIRTEL')) return 'AIRTEL';
+    if (s.includes('IDFC')) return 'IDFC';
+    if (s.includes('IDBI')) return 'IDBI';
     if (s.includes('ICICI')) return 'ICICI';
     if (s.includes('HDFC')) return 'HDFC';
-    if (s.includes('AXIS')) return 'AXIS';
+    if (s.includes('AXIS') || s.includes('UTIBANK')) return 'AXIS';
     if (s.includes('KOTAK')) return 'KOTAK';
-    if (s.includes('PUNJAB') || s === 'PNB' || s.includes('PNB')) return 'PNB';
-    if (s.includes('BARODA') || s === 'BOB' || s.includes('BOB')) return 'BOB';
     if (s.includes('CANARA')) return 'CANARA';
-    if (s.includes('CITYUNION') || s === 'CUB') return 'CUB';
-    if (s.includes('CENTRAL') || s === 'CBI') return 'CENTRAL';
-    if (s.includes('UNION') || s.includes('UNIONBANK')) return 'UNION';
-    if (s.includes('BANKOFINDIA') || s === 'BOI') return 'BOI';
-    if (s.includes('IDFC')) return 'IDFC';
-    if (s.includes('YES')) return 'YES';
+    if (s.includes('YESBANK') || s === 'YES' || (s.startsWith('YES') && s.includes('BANK'))) return 'YES';
     if (s.includes('INDUSIND')) return 'INDUSIND';
     if (s.includes('FEDERAL')) return 'FEDERAL';
     if (s.includes('BANDHAN')) return 'BANDHAN';
-    if (s.includes('IDBI')) return 'IDBI';
     if (s.includes('UCO')) return 'UCO';
-    if (s.includes('OVERSEAS') || s === 'IOB') return 'IOB';
-    if (s.includes('SOUTHINDIAN') || s === 'SIB') return 'SIB';
-    if (s.includes('KARUR') || s === 'KVB') return 'KVB';
-    if (s.includes('PAYTM')) return 'PAYTM';
-    if (s.includes('AIRTEL')) return 'AIRTEL';
-    if (s.includes('POST') || s === 'IPPB') return 'IPPB';
-    if (s.includes('RBL')) return 'RBL';
-    if (s === 'AU' || s.includes('AUBANK') || s.includes('AUSMALL')) return 'AU';
+    if (s.includes('RBL') || s.includes('RATNAKAR')) return 'RBL';
+    if (s === 'AU' || s.includes('AUBANK') || s.includes('AUSMALL') || s.includes('AUFINANCE')) return 'AU';
     if (s.includes('EQUITAS')) return 'EQUITAS';
     return s;
   }
@@ -238,15 +238,16 @@ const BankLogos = (() => {
 
   function getLogo(bankName) {
     if (!bankName) return null;
-    const cache = getCustomCache();
     const key = normalizeKey(bankName);
 
-    if (cache[key]) return cache[key];
     if (FULL_LOGOS[key]) return FULL_LOGOS[key].dataUrl;
 
+    const cache = getCustomCache();
+    if (cache[key]) return cache[key];
+
     const upper = bankName.trim().toUpperCase();
-    if (cache[upper]) return cache[upper];
     if (FULL_LOGOS[upper]) return FULL_LOGOS[upper].dataUrl;
+    if (cache[upper]) return cache[upper];
 
     return null;
   }

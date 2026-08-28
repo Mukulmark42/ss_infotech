@@ -29,7 +29,8 @@ const ReportClassic = (() => {
     const footer    = (adminConfig && adminConfig.footer)    || 'Professional Tax Computation Services';
     const signatory = (adminConfig && adminConfig.signatory) || 'Proprietor';
     const fy        = _getFY(client.ay);
-    const today     = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+    const filingDateObj = _getFilingDateObj(client);
+    const today     = filingDateObj.toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
     const cmpNo     = compNo || 'CMP-' + new Date().getFullYear() + '-000001';
 
     const profitPct   = data.profitPct || 20;
@@ -618,6 +619,22 @@ ${secTitle('ANNEXURE H &nbsp; TAXPAYER INFORMATION SUMMARY (TIS) – COMPARISON 
     const y2Str = ay.split('-')[1] || '';
     const y2 = y2Str ? parseInt(y2Str) - 1 : '';
     return `${y1}-${y2}`;
+  }
+
+  function _getFilingDateObj(client) {
+    if (client && client.filingDate) {
+      if (typeof client.filingDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(client.filingDate)) {
+        const [y, m, d] = client.filingDate.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+      const d = new Date(client.filingDate);
+      if (!isNaN(d.getTime())) return d;
+    }
+    if (client && client.createdAt) {
+      const d = new Date(client.createdAt);
+      if (!isNaN(d.getTime())) return d;
+    }
+    return new Date();
   }
 
   return { generate };

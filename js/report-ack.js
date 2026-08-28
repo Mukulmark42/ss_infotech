@@ -22,7 +22,15 @@ const ReportAck = (() => {
   /** Format Date in DD-Mon-YYYY (e.g. 29-Jul-2026) */
   function _fmtDate(d) {
     if (!d) d = new Date();
-    const dateObj = (typeof d === 'string' || typeof d === 'number') ? new Date(d) : d;
+    let dateObj = d;
+    if (typeof d === 'string' || typeof d === 'number') {
+      if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+        const [y, m, day] = d.split('-').map(Number);
+        dateObj = new Date(y, m - 1, day);
+      } else {
+        dateObj = new Date(d);
+      }
+    }
     if (isNaN(dateObj.getTime())) return _fmtDate(new Date());
     const day = String(dateObj.getDate()).padStart(2, '0');
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -253,7 +261,7 @@ const ReportAck = (() => {
     
     // Acknowledgement & Filing details
     const ackNo       = _getAckNo(client, data.compNo);
-    const filingDateObj = client.filingDate ? new Date(client.filingDate) : (client.createdAt ? new Date(client.createdAt) : new Date());
+    const filingDateObj = _getFilingDateObj(client);
     const filingDate  = _fmtDate(filingDateObj);
     const filingTime  = client.filingTime || _fmtTime(filingDateObj);
     const ipAddress   = _getIP(client);
@@ -545,19 +553,15 @@ const ReportAck = (() => {
   border-right: 1px solid #B8C0D8;
   border-bottom: 1px solid #B8C0D8;
   box-sizing: border-box;
-  padding: 5pt 8pt 3pt 8pt;
+  padding: 5pt 8pt 4pt 8pt;
   font-size: 8.5pt;
-  line-height: 1.6;
+  line-height: 1.65;
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: left;
   background: #fff;
   font-family: Arial, Helvetica, 'DejaVu Sans', sans-serif;
   margin-bottom: 0;
-}
-
-.itr-ack-ver-line {
-  display: block;
-  white-space: nowrap;
-  margin: 0;
-  padding: 0;
 }
 
 .itr-ack-u {
@@ -565,20 +569,20 @@ const ReportAck = (() => {
   border-bottom: 1px solid #000;
   text-align: center;
   font-weight: 400;
-  padding: 0 4px;
-  margin: 0 2px;
+  padding: 0 3px;
+  margin: 0 1px;
   line-height: 1.1;
   vertical-align: baseline;
   box-sizing: border-box;
 }
 
-.itr-ack-u-datetime { min-width: 140px; }
-.itr-ack-u-ip { min-width: 110px; }
-.itr-ack-u-name { min-width: 160px; }
-.itr-ack-u-pan { min-width: 90px; }
-.itr-ack-u-date { min-width: 80px; }
-.itr-ack-u-evc { min-width: 100px; }
-.itr-ack-u-mode { min-width: 110px; }
+.itr-ack-u-datetime { min-width: 130px; }
+.itr-ack-u-ip { min-width: 100px; }
+.itr-ack-u-name { min-width: 140px; }
+.itr-ack-u-pan { min-width: 85px; }
+.itr-ack-u-date { min-width: 75px; }
+.itr-ack-u-evc { min-width: 95px; }
+.itr-ack-u-mode { min-width: 90px; }
 
 /* ── 6. Dedicated Barcode / QR Code Block ── */
 .itr-ack-barcode-table {
@@ -830,10 +834,7 @@ const ReportAck = (() => {
 
   <!-- ── 5. Dedicated Verification Block (Single continuous text section) ── -->
   <div class="itr-ack-verification-box">
-    <div class="itr-ack-ver-line">Income Tax Return electronically transmitted on <span class="itr-ack-u itr-ack-u-datetime">${filingDate} ${filingTime}</span> from IP address <span class="itr-ack-u itr-ack-u-ip">${ipAddress}</span></div>
-    <div class="itr-ack-ver-line">and verified by <span class="itr-ack-u itr-ack-u-name">${name}</span> having PAN <span class="itr-ack-u itr-ack-u-pan">${pan}</span> on <span class="itr-ack-u itr-ack-u-date">${filingDate}</span> using</div>
-    <div class="itr-ack-ver-line">paper ITR-Verification Form /Electronic Verification Code <span class="itr-ack-u itr-ack-u-evc">${evcCode}</span> generated through <span class="itr-ack-u itr-ack-u-mode">${evcMode}</span></div>
-    <div class="itr-ack-ver-line">mode</div>
+    Income Tax Return electronically transmitted on <span class="itr-ack-u itr-ack-u-datetime">${filingDate} ${filingTime}</span> from IP address <span class="itr-ack-u itr-ack-u-ip">${ipAddress}</span> and verified by <span class="itr-ack-u itr-ack-u-name">${name}</span> having PAN <span class="itr-ack-u itr-ack-u-pan">${pan}</span> on <span class="itr-ack-u itr-ack-u-date">${filingDate}</span> using paper ITR-Verification Form /Electronic Verification Code <span class="itr-ack-u itr-ack-u-evc">${evcCode}</span> generated through <span class="itr-ack-u itr-ack-u-mode">${evcMode}</span> mode
   </div>
 
   <!-- ── 6. Dedicated Barcode / QR Code Block ── -->
@@ -856,6 +857,22 @@ const ReportAck = (() => {
 
 </div>
     `;
+  }
+
+  function _getFilingDateObj(client) {
+    if (client && client.filingDate) {
+      if (typeof client.filingDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(client.filingDate)) {
+        const [y, m, d] = client.filingDate.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+      const d = new Date(client.filingDate);
+      if (!isNaN(d.getTime())) return d;
+    }
+    if (client && client.createdAt) {
+      const d = new Date(client.createdAt);
+      if (!isNaN(d.getTime())) return d;
+    }
+    return new Date();
   }
 
   return {

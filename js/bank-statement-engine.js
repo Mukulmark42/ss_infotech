@@ -70,14 +70,47 @@ const BankStatementEngine = (() => {
     'EQUITAS SMALL FINANCE BANK': 'equitasbank.com'
   };
 
+  const DOMAIN_BY_KEY = {
+    'SBI': 'sbi.co.in',
+    'HDFC': 'hdfcbank.com',
+    'ICICI': 'icicibank.com',
+    'AXIS': 'axisbank.com',
+    'KOTAK': 'kotak.com',
+    'PNB': 'pnbindia.in',
+    'BOB': 'bankofbaroda.in',
+    'CANARA': 'canarabank.com',
+    'UNION': 'unionbankofindia.co.in',
+    'BOI': 'bankofindia.co.in',
+    'IOB': 'iob.in',
+    'UCO': 'ucobank.com',
+    'CENTRAL': 'centralbankofindia.co.in',
+    'IDBI': 'idbibank.in',
+    'INDUSIND': 'indusind.com',
+    'YES': 'yesbank.in',
+    'FEDERAL': 'federalbank.co.in',
+    'SIB': 'southindianbank.com',
+    'KVB': 'kvb.co.in',
+    'CUB': 'cityunionbank.com',
+    'BANDHAN': 'bandhanbank.com',
+    'PAYTM': 'paytmbank.com',
+    'AIRTEL': 'airtel.in',
+    'IPPB': 'ippbonline.com',
+    'IDFC': 'idfcfirstbank.com',
+    'RBL': 'rblbank.com',
+    'AU': 'aubank.in',
+    'EQUITAS': 'equitasbank.com'
+  };
+
   function getBankDomain(name) {
     if (!name) return 'bank.com';
     const upper = name.trim().toUpperCase();
     if (BANK_DOMAINS[upper]) return BANK_DOMAINS[upper];
     const stripped = upper.replace(/\s+(LIMITED|LTD|PVT|PRIVATE)\b/g, '').trim();
     if (BANK_DOMAINS[stripped]) return BANK_DOMAINS[stripped];
-    for (const [k, d] of Object.entries(BANK_DOMAINS)) {
-      if (upper.includes(k) || k.includes(upper) || stripped.includes(k) || k.includes(stripped)) return d;
+
+    if (typeof BankLogos !== 'undefined' && BankLogos.normalizeKey) {
+      const key = BankLogos.normalizeKey(upper);
+      if (DOMAIN_BY_KEY[key]) return DOMAIN_BY_KEY[key];
     }
     return `${stripped.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
   }
@@ -745,7 +778,6 @@ const BankStatementEngine = (() => {
         <td class="col-tranid">${_esc(r.tranId)}</td>
         <td class="col-valdate">${_esc(r.valueDate)}</td>
         <td class="col-txndate">${_esc(r.txnDate)}</td>
-        <td class="col-postdate">${_esc(r.postedDate)}</td>
         <td class="col-ref">${_esc(r.refNo)}</td>
         <td class="col-remarks">${_esc(r.description || '')}</td>
         <td class="col-dr">${r.dr ? fmt(r.dr) : ''}</td>
@@ -888,13 +920,12 @@ const BankStatementEngine = (() => {
     vertical-align: top;
     line-height: 1.25;
   }
-  .col-sl { width: 3.5%; text-align: center; font-weight: 700; }
-  .col-tranid { width: 6.5%; word-break: break-all; }
-  .col-valdate { width: 8%; white-space: nowrap; }
-  .col-txndate { width: 8%; white-space: nowrap; }
-  .col-postdate { width: 10%; word-break: break-word; }
-  .col-ref { width: 7.5%; word-break: break-all; }
-  .col-remarks { width: 28.5%; word-break: break-word; font-family: monospace; font-size: 6.8pt; line-height: 1.2; }
+  .col-sl { width: 4%; text-align: center; font-weight: 700; }
+  .col-tranid { width: 8%; word-break: break-all; }
+  .col-valdate { width: 9%; white-space: nowrap; }
+  .col-txndate { width: 9%; white-space: nowrap; }
+  .col-ref { width: 9%; word-break: break-all; }
+  .col-remarks { width: 33%; word-break: break-word; font-family: monospace; font-size: 6.8pt; line-height: 1.2; }
   .col-dr { width: 9%; text-align: right; font-variant-numeric: tabular-nums; }
   .col-cr { width: 9%; text-align: right; font-variant-numeric: tabular-nums; }
   .col-bal { width: 10%; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -1020,7 +1051,6 @@ const BankStatementEngine = (() => {
         <th class="col-tranid">Tran<br>Id</th>
         <th class="col-valdate">Value<br>Date</th>
         <th class="col-txndate">Transaction<br>Date</th>
-        <th class="col-postdate">Transaction<br>Posted Date</th>
         <th class="col-ref">Cheque no /<br>Ref No</th>
         <th class="col-remarks">Transaction<br>Remarks</th>
         <th class="col-dr" style="text-align:right">Withdrawal<br>(Dr)</th>
@@ -1034,7 +1064,6 @@ const BankStatementEngine = (() => {
         <td class="col-tranid">--</td>
         <td class="col-valdate">${fromDateDisplay}</td>
         <td class="col-txndate">${fromDateDisplay}</td>
-        <td class="col-postdate">${fromDateDisplay}</td>
         <td class="col-ref">--</td>
         <td class="col-remarks"><strong>OPENING BALANCE</strong></td>
         <td class="col-dr"></td>

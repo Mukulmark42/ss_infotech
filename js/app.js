@@ -1772,23 +1772,68 @@ const App = (() => {
     'PAYTM PAYMENTS BANK LTD',
     'AIRTEL PAYMENTS BANK LTD',
     'INDIA POST PAYMENTS BANK',
+    'RBL BANK LTD',
+    'AU SMALL FINANCE BANK',
+    'EQUITAS SMALL FINANCE BANK'
   ];
 
   function _resolveBankLogo(bankName, savedLogoData) {
     if (!bankName) return null;
-    // 1. If savedLogoData is a valid base64 data URL, use it
+    // 1. Check local offline BankLogos repository first for authentic official logos
+    if (typeof BankLogos !== 'undefined' && BankLogos.hasLogo && BankLogos.hasLogo(bankName)) {
+      return BankLogos.getLogo(bankName);
+    }
+    // 2. If savedLogoData is a valid base64 data URL (custom upload), use it
     if (savedLogoData && typeof savedLogoData === 'string' && savedLogoData.startsWith('data:image/')) {
       return savedLogoData;
     }
-    // 2. Check local offline Brandfetch BankLogos repository
+    // 3. Fallback to BankLogos getLogo
     if (typeof BankLogos !== 'undefined' && BankLogos.getLogo) {
       const repoLogo = BankLogos.getLogo(bankName);
       if (repoLogo) return repoLogo;
     }
-    // 3. If savedLogoData is a valid external URL (not broken cdn.brandfetch.io)
+    // 4. If savedLogoData is a valid external URL (not broken cdn.brandfetch.io)
     if (savedLogoData && typeof savedLogoData === 'string' && !savedLogoData.includes('cdn.brandfetch.io')) {
       return savedLogoData;
     }
+    return null;
+  }
+
+  function _bankName(b) {
+    return (typeof b === 'string') ? b : (b.name || '');
+  }
+
+  function _matchBank(bankName, bankList) {
+    if (!bankName || !Array.isArray(bankList) || bankList.length === 0) return null;
+    const clean = bankName.trim().toUpperCase();
+    if (!clean) return null;
+
+    // 1. Exact match
+    const exact = bankList.find(b => _bankName(b).trim().toUpperCase() === clean);
+    if (exact) return exact;
+
+    // 2. Normalized key match via BankLogos
+    if (typeof BankLogos !== 'undefined' && BankLogos.normalizeKey) {
+      const targetKey = BankLogos.normalizeKey(clean);
+      if (targetKey && targetKey !== 'DEFAULT' && targetKey.length > 1) {
+        const keyMatch = bankList.find(b => {
+          const bKey = BankLogos.normalizeKey(_bankName(b));
+          return bKey === targetKey;
+        });
+        if (keyMatch) return keyMatch;
+      }
+    }
+
+    // 3. Exact stripped word match (without LTD, LIMITED, BANK, PVT, PRIVATE, CO, CORP)
+    const strippedClean = clean.replace(/\s+(LIMITED|LTD|PVT|PRIVATE|BANK|CO|CORP)\b/g, '').trim();
+    if (strippedClean.length > 2) {
+      const strippedMatch = bankList.find(b => {
+        const bStripped = _bankName(b).trim().toUpperCase().replace(/\s+(LIMITED|LTD|PVT|PRIVATE|BANK|CO|CORP)\b/g, '').trim();
+        return bStripped === strippedClean;
+      });
+      if (strippedMatch) return strippedMatch;
+    }
+
     return null;
   }
 
@@ -1823,10 +1868,6 @@ const App = (() => {
     });
   }
 
-  function _bankName(b) {
-    return (typeof b === 'string') ? b : (b.name || '');
-  }
-
   function _getBankConfigObjects() {
     return _getBankConfigs().map(b => {
       const name = typeof b === 'string' ? b : (b.name || '');
@@ -1859,8 +1900,7 @@ const App = (() => {
     }
     const initial = name.trim().toUpperCase().slice(0, 2) || 'B';
     const bankConfigs = _getBankConfigObjects();
-    const cleanName = name.trim().toUpperCase();
-    const matchedBank = bankConfigs.find(b => b.name.toUpperCase() === cleanName || b.name.toUpperCase().includes(cleanName) || cleanName.includes(b.name.toUpperCase()));
+    const matchedBank = _matchBank(name, bankConfigs);
     const savedLogo = matchedBank ? matchedBank.logoData : null;
     const localLogo = _resolveBankLogo(name, savedLogo);
     if (localLogo) {
@@ -1914,25 +1954,14 @@ const App = (() => {
               if (!o.value) return false;
               const ov = o.value.toUpperCase().trim();
               if (ov === cleanBank) return true;
-              if (cleanBank.includes(ov) || ov.includes(cleanBank)) return true;
-              if (cleanBank.includes('STATE BANK') && (ov.includes('SBI') || ov.includes('STATE BANK'))) return true;
-              if (cleanBank.includes('PUNJAB NATIONAL') && (ov.includes('PNB') || ov.includes('PUNJAB'))) return true;
-              if (cleanBank.includes('BANK OF BARODA') && (ov.includes('BOB') || ov.includes('BARODA'))) return true;
-              if (cleanBank.includes('CENTRAL BANK') && (ov.includes('CBI') || ov.includes('CENTRAL'))) return true;
-              if (cleanBank.includes('UNION BANK') && (ov.includes('UBI') || ov.includes('UNION'))) return true;
-              if (cleanBank.includes('CANARA') && ov.includes('CANARA')) return true;
-              if (cleanBank.includes('AXIS') && ov.includes('AXIS')) return true;
-              if (cleanBank.includes('HDFC') && ov.includes('HDFC')) return true;
-              if (cleanBank.includes('ICICI') && ov.includes('ICICI')) return true;
-              if (cleanBank.includes('KOTAK') && ov.includes('KOTAK')) return true;
-              if (cleanBank.includes('INDUSIND') && ov.includes('INDUSIND')) return true;
-              if (cleanBank.includes('BANDHAN') && ov.includes('BANDHAN')) return true;
-              if (cleanBank.includes('YES BANK') && ov.includes('YES')) return true;
-              if (cleanBank.includes('IDBI') && ov.includes('IDBI')) return true;
-              if (cleanBank.includes('FEDERAL') && ov.includes('FEDERAL')) return true;
-              if (cleanBank.includes('UCO') && ov.includes('UCO')) return true;
-              if (cleanBank.includes('INDIAN BANK') && ov.includes('INDIAN BANK')) return true;
-              if (cleanBank.includes('BANK OF INDIA') && (ov.includes('BOI') || ov.includes('BANK OF INDIA'))) return true;
+              if (typeof BankLogos !== 'undefined' && BankLogos.normalizeKey) {
+                const k1 = BankLogos.normalizeKey(cleanBank);
+                const k2 = BankLogos.normalizeKey(ov);
+                if (k1 && k1 !== 'DEFAULT' && k1 === k2) return true;
+              }
+              const s1 = cleanBank.replace(/\s+(LIMITED|LTD|PVT|PRIVATE|BANK)\b/g, '').trim();
+              const s2 = ov.replace(/\s+(LIMITED|LTD|PVT|PRIVATE|BANK)\b/g, '').trim();
+              if (s1.length > 2 && s1 === s2) return true;
               return false;
             });
             if (!opt && rawBank) {
@@ -3721,8 +3750,8 @@ const App = (() => {
       bankSel.dataset.bound = '1';
       const handleBankSelect = () => {
         const banks = _getBankConfigObjects();
-        const bVal = (bankSel.value || '').trim().toUpperCase();
-        const bank = banks.find(b => b.name.toUpperCase() === bVal || (bVal && b.name.toUpperCase().includes(bVal)) || (bVal && bVal.includes(b.name.toUpperCase())));
+        const bVal = (bankSel.value || '').trim();
+        const bank = _matchBank(bVal, banks);
         _statementBankLogoData = null;
         const uploadEl = document.getElementById('bs-logo-upload'); if (uploadEl) uploadEl.value = '';
         if (bank) {
@@ -3747,7 +3776,7 @@ const App = (() => {
           _updateStatementBankLogoPreview(null);
         }
 
-        if (bVal.includes('ICICI')) {
+        if (bVal.toUpperCase().includes('ICICI')) {
           const ifscEl = document.getElementById('bs-ifsc');
           if (ifscEl && !ifscEl.value) ifscEl.value = 'ICIC0000914';
           const codeEl = document.getElementById('bs-branchcode');
@@ -3811,7 +3840,7 @@ const App = (() => {
         banks.map(b => `<option value="${_esc(b.name)}">${_esc(b.name)}</option>`).join('');
 
       if (!sel.value) {
-        const icici = banks.find(b => b.name.toUpperCase().includes('ICICI'));
+        const icici = _matchBank('ICICI', banks);
         if (icici) {
           sel.value = icici.name;
           _updateStatementBankLogoPreview(icici);
@@ -3820,12 +3849,12 @@ const App = (() => {
           _updateStatementBankLogoPreview(banks[0]);
         }
       } else {
-        const currentBank = banks.find(b => b.name === sel.value);
+        const currentBank = _matchBank(sel.value, banks) || { name: sel.value };
         _updateStatementBankLogoPreview(currentBank);
       }
     } else {
       if (!sel.value) {
-        const icici = banks.find(b => b.name.toUpperCase().includes('ICICI'));
+        const icici = _matchBank('ICICI', banks);
         if (icici) {
           sel.value = icici.name;
           _updateStatementBankLogoPreview(icici);
@@ -3834,7 +3863,7 @@ const App = (() => {
           _updateStatementBankLogoPreview(banks[0]);
         }
       } else {
-        const currentBank = banks.find(b => b.name.toUpperCase() === sel.value.toUpperCase().trim()) || { name: sel.value };
+        const currentBank = _matchBank(sel.value, banks) || { name: sel.value };
         _updateStatementBankLogoPreview(currentBank);
       }
     }
@@ -3967,9 +3996,7 @@ const App = (() => {
   function _collectStatementData() {
     const bankName = (document.getElementById('bs-bank')?.value || '').trim();
     const banks = _getBankConfigObjects();
-    const bank = banks.find(b => b.name.toUpperCase() === bankName.toUpperCase()) ||
-                 banks.find(b => bankName && (b.name.toUpperCase().includes(bankName.toUpperCase()) || bankName.toUpperCase().includes(b.name.toUpperCase()))) ||
-                 { name: bankName };
+    const bank = _matchBank(bankName, banks) || { name: bankName };
     const savedLogo = bank.logoData || _resolveBankLogo(bank.name || bankName, null);
     const effectiveLogo = _statementBankLogoData || savedLogo || null;
     const rows = document.querySelectorAll('#stmt-tx-list .stmt-tx-row');
@@ -4233,8 +4260,8 @@ const App = (() => {
       bankSel.dataset.bound = '1';
       const handleBankSelect = () => {
         const banks = _getBankConfigObjects();
-        const bVal = (bankSel.value || '').trim().toUpperCase();
-        const bank = banks.find(b => b.name.toUpperCase() === bVal || (bVal && b.name.toUpperCase().includes(bVal)) || (bVal && bVal.includes(b.name.toUpperCase())));
+        const bVal = (bankSel.value || '').trim();
+        const bank = _matchBank(bVal, banks);
         _salaryStatementBankLogoData = null;
         const uploadEl = document.getElementById('bss-logo-upload'); if (uploadEl) uploadEl.value = '';
         if (bank) {
@@ -4259,7 +4286,7 @@ const App = (() => {
           _updateSalaryStatementBankLogoPreview(null);
         }
 
-        if (bVal.includes('ICICI')) {
+        if (bVal.toUpperCase().includes('ICICI')) {
           const ifscEl = document.getElementById('bss-ifsc');
           if (ifscEl && !ifscEl.value) ifscEl.value = 'ICIC0000914';
           const codeEl = document.getElementById('bss-branchcode');
@@ -4335,7 +4362,7 @@ const App = (() => {
     if (!sel) return;
 
     if (!sel.value) {
-      const icici = banks.find(b => b.name.toUpperCase().includes('ICICI'));
+      const icici = _matchBank('ICICI', banks);
       if (icici) {
         sel.value = icici.name;
         _updateSalaryStatementBankLogoPreview(icici);
@@ -4344,7 +4371,7 @@ const App = (() => {
         _updateSalaryStatementBankLogoPreview(banks[0]);
       }
     } else {
-      const currentBank = banks.find(b => b.name.toUpperCase() === sel.value.toUpperCase().trim()) || { name: sel.value };
+      const currentBank = _matchBank(sel.value, banks) || { name: sel.value };
       _updateSalaryStatementBankLogoPreview(currentBank);
     }
   }
@@ -4544,9 +4571,7 @@ const App = (() => {
   function _collectSalaryStatementData() {
     const bankName = (document.getElementById('bss-bank')?.value || '').trim();
     const banks = _getBankConfigObjects();
-    const bank = banks.find(b => b.name.toUpperCase() === bankName.toUpperCase()) ||
-                 banks.find(b => bankName && (b.name.toUpperCase().includes(bankName.toUpperCase()) || bankName.toUpperCase().includes(b.name.toUpperCase()))) ||
-                 { name: bankName };
+    const bank = _matchBank(bankName, banks) || { name: bankName };
     const savedLogo = bank.logoData || _resolveBankLogo(bank.name || bankName, null);
     const effectiveLogo = _salaryStatementBankLogoData || savedLogo || null;
     const rows = document.querySelectorAll('#stmt-salary-tx-list .stmt-tx-row');
@@ -4817,7 +4842,7 @@ const App = (() => {
   function reprintStatementRecord(id) {
     const r = DB.getStatementRecords().find(rec => rec.id === id);
     if (!r) return;
-    const resolvedLogo = r.bankLogo || ((typeof BankLogos !== 'undefined') ? BankLogos.getLogo(r.bankName) : null);
+    const resolvedLogo = _resolveBankLogo(r.bankName, r.bankLogo);
     const html = BankStatementEngine.generate({
       style: r.style || 'icici',
       bank: { name: r.bankName, logoData: resolvedLogo, logoText: r.bankLogoText, address: r.branchAddress || r.bankAddress },

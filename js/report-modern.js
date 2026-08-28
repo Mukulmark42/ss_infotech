@@ -20,7 +20,8 @@ const ReportModern = (() => {
     const footer    = (adminConfig && adminConfig.footer)    || 'Professional Tax Computation Services';
     const signatory = (adminConfig && adminConfig.signatory) || 'Proprietor';
     const fy        = _getFY(client.ay);
-    const today     = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+    const filingDateObj = _getFilingDateObj(client);
+    const today     = filingDateObj.toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
     const cmpNo     = compNo || data.compNo || 'CMP-' + new Date().getFullYear() + '-000001';
     const initials  = (client.name || 'C').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
     const profitPct = data.profitPct || 20;
@@ -596,6 +597,22 @@ const ReportModern = (() => {
     if (!ay) return '';
     const parts = ay.split('-');
     return `${parseInt(parts[0])-1}-${parts[1] ? parseInt(parts[1])-1 : ''}`;
+  }
+
+  function _getFilingDateObj(client) {
+    if (client && client.filingDate) {
+      if (typeof client.filingDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(client.filingDate)) {
+        const [y, m, d] = client.filingDate.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+      const d = new Date(client.filingDate);
+      if (!isNaN(d.getTime())) return d;
+    }
+    if (client && client.createdAt) {
+      const d = new Date(client.createdAt);
+      if (!isNaN(d.getTime())) return d;
+    }
+    return new Date();
   }
 
   return { generate };
